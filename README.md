@@ -120,19 +120,14 @@ Keep it up mama! 💪
 ## 🏗️ Architecture
 ```
 mamacare-butler/
-├── mamacare_server/      # Serverpod backend (Dart)
-│   ├── endpoints/        # API endpoints
-│   ├── protocols/        # Data models (FHIR-compliant)
-│   ├── services/         # Business logic
-│   │   ├── gemini_service.dart
-│   │   ├── whatsapp_service.dart
-│   │   ├── sms_service.dart
-│   │   └── risk_calculator.dart
-│   └── scheduled/        # Cron jobs (daily reminders)
-├── mamacare_client/      # Generated API client
-├── mamacare_flutter/     # Flutter mobile app
-├── docs/                 # Documentation
-└── scripts/              # Build & deployment scripts
+├── mamacare_server/     
+│   ├── endpoints/       
+│   ├── protocols/        
+│   ├── services/         
+│   └── scheduled/       
+├── mamacare_client/     
+├── mamacare_flutter/     
+├── docs/                 
 ```
 
 ### Tech Stack
