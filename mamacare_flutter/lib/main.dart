@@ -33,8 +33,9 @@ void main() async {
   // no matter which environment it is running in.
   final config = await AppConfig.loadConfig();
   final serverUrl = serverUrlFromEnv.isEmpty
-      ? config.apiUrl ?? 'http://$localhost:8080/'
+      ? config.apiUrl ?? 'http://10.0.2.2:8083/'
       : serverUrlFromEnv;
+  print('🔥 Connecting to server: $serverUrl');
 
   client = Client(serverUrl)
     ..connectivityMonitor = FlutterConnectivityMonitor()
