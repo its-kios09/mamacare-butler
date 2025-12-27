@@ -1,0 +1,5 @@
+class: AuthException
+fields:
+  message: String
+  code: String
+  statusCode: int

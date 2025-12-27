@@ -1,0 +1,5 @@
+class: AuthResponse
+fields:
+  user: User?
+  error: AuthException?
+  success: bool

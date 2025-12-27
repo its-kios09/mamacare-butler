@@ -1,0 +1,7 @@
+class: User
+table: users
+fields:
+  phoneNumber: String
+  name: String?
+  createdAt: DateTime
+  updatedAt: DateTime?
