@@ -90,7 +90,8 @@ class StorageService {
   }
 
   Future<void> logout() async {
-    await clearSecure();
-    await clear();
+    // Only delete auth token, keep PIN and phone number
+    await deleteSecure('auth_token');
+    // Don't clear everything - keep PIN and biometric settings
   }
 }

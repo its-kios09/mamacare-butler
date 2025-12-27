@@ -70,7 +70,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
         title: const Text('Create PIN'),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(24.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -135,7 +135,7 @@ class _PinSetupScreenState extends State<PinSetupScreen> {
                     ],
                   ),
                 ),
-              const Spacer(),
+              SizedBox(height: 100.h),
               Container(
                 padding: EdgeInsets.all(16.w),
                 decoration: BoxDecoration(

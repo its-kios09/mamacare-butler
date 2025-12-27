@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mamacare_flutter/screens/auth/pin_setup_screen.dart';
 
+import '../../main.dart';
 import '../../services/auth_service.dart';
+import '../../services/storage_service.dart';
 import '../../widgets/pin_input_widget.dart';
 import '../home/home_screen.dart';
 import 'phone_input_screen.dart';
-// pin_login_screen.dart
+
 class PinLoginScreen extends StatefulWidget {
   final bool showBiometric;
+  final String? phoneNumber;
+
 
   const PinLoginScreen({
     super.key,
     this.showBiometric = false,
+    this.phoneNumber
   });
 
   @override
@@ -27,13 +33,19 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.showBiometric) {
+    _checkAndTriggerBiometric();
+  }
+
+  Future<void> _checkAndTriggerBiometric() async {
+    final isEnabled = StorageService().getBiometricEnabled();
+    final canUse = await _authService.canUseBiometric();
+
+    if (isEnabled && canUse && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _loginWithBiometric();
       });
     }
   }
-
   Future<void> _loginWithBiometric() async {
     setState(() {
       _isLoading = true;
@@ -106,6 +118,64 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
       ),
     );
   }
+  void _showForgotPinDialog() {
+    final phoneController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset PIN'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Enter your registered phone number to reset PIN'),
+            const SizedBox(height: 16),
+            TextField(
+              controller: phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(
+                labelText: 'Phone Number',
+                hintText: '0791660287',
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () async {
+              final phone = phoneController.text.trim();
+
+              // Check if user exists
+              final user = await client.v1Auth.getUserByPhone(phone);
+
+              if (user != null) {
+                Navigator.pop(context);
+                // Navigate to PIN setup with same phone
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PinSetupScreen(phoneNumber: user.phoneNumber),
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Phone number not found'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Reset PIN'),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +191,7 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(24.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -155,8 +225,32 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
                   color: Colors.grey[600],
                 ),
               ),
-
+              if (widget.phoneNumber != null) ...[
+                SizedBox(height: 16.h),
+                Container(
+                  padding: EdgeInsets.all(12.w),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8.r),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.phone, size: 16.sp, color: Colors.grey[600]),
+                      SizedBox(width: 8.w),
+                      Text(
+                        widget.phoneNumber!,
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               SizedBox(height: 40.h),
+
 
               // PIN Input
               PinInputWidget(
@@ -198,26 +292,34 @@ class _PinLoginScreenState extends State<PinLoginScreen> {
               SizedBox(height: 32.h),
 
               // Biometric button
-              if (widget.showBiometric)
-                OutlinedButton.icon(
-                  onPressed: _isLoading ? null : _loginWithBiometric,
-                  icon: const Icon(Icons.fingerprint),
-                  label: const Text('Use Biometric'),
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(vertical: 16.h),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                  ),
-                ),
+              // Biometric button - show if enabled in storage
+              FutureBuilder<bool>(
+                future: _authService.canUseBiometric(),
+                builder: (context, snapshot) {
+                  final canUse = snapshot.data ?? false;
+                  final isEnabled = StorageService().getBiometricEnabled();
 
-              const Spacer(),
+                  if (!canUse || !isEnabled) return const SizedBox.shrink();
 
+                  return Column(
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: _isLoading ? null : _loginWithBiometric,
+                        icon: const Icon(Icons.fingerprint),
+                        label: const Text('Use Biometric')
+                      ),
+                      SizedBox(height: 16.h),
+                    ],
+                  );
+                },
+              ),
+
+              SizedBox(height: 100.h),
               // Forgot PIN
               TextButton(
-                onPressed: _logout,
+                onPressed: _showForgotPinDialog,
                 child: Text(
-                  'Forgot PIN? Logout and create new account',
+                  'Forgot PIN?',
                   style: TextStyle(fontSize: 12.sp),
                 ),
               ),

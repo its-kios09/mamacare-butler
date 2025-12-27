@@ -19,11 +19,13 @@ class PinInputWidget extends StatefulWidget {
 class _PinInputWidgetState extends State<PinInputWidget> {
   final _pinController = TextEditingController();
 
-  @override
-  void dispose() {
-    _pinController.dispose();
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   if (mounted) {
+  //     _pinController.dispose();
+  //   }
+  //   super.dispose();
+  // }
 
   @override
   Widget build(BuildContext context) {

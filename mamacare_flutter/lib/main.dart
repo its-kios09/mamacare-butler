@@ -1,16 +1,30 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mamacare_client/mamacare_client.dart';
+import 'package:serverpod_flutter/serverpod_flutter.dart';
 
 import 'services/storage_service.dart';
 import 'services/auth_service.dart';
 import 'screens/auth/phone_input_screen.dart';
 import 'screens/auth/pin_login_screen.dart';
 
+// Global Serverpod client
+late final Client client;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize storage
   await StorageService().init();
+
+  // Initialize Serverpod client
+  client = Client('http://192.168.1.70:8083/');
+  if (kDebugMode) {
+    print('🔥 Serverpod client initialized: http://192.168.1.70:8083/');
+  }
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -104,11 +118,10 @@ class _SplashScreenState extends State<SplashScreen> {
             Text(
               'MamaCare',
               style: TextStyle(
-                fontSize: 36.sp,
-                color: Colors.white,
-                letterSpacing: 1.2,
+                  fontSize: 36.sp,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
                   fontFamily: GoogleFonts.ibmPlexSans().fontFamily
-
               ),
             ),
             SizedBox(height: 8.h),
@@ -131,10 +144,10 @@ class _SplashScreenState extends State<SplashScreen> {
             Text(
               'AI-Powered Maternal Health',
               style: TextStyle(
-                fontSize: 14.sp,
-                color: Colors.white.withOpacity(0.8),
+                  fontSize: 14.sp,
+                  color: Colors.white.withOpacity(0.8),
                   fontFamily: GoogleFonts.ibmPlexSans().fontFamily
-            ),
+              ),
             ),
           ],
         ),
