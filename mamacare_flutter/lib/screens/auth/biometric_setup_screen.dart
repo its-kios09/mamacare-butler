@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../services/auth_service.dart';
 import '../home/home_screen.dart';
-
+// filename: biomertic_setup_screen
 class BiometricSetupScreen extends StatefulWidget {
   const BiometricSetupScreen({super.key});
 

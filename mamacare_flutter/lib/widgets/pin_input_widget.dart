@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-
+// pin_input_widget.dart
 class PinInputWidget extends StatefulWidget {
   final Function(String) onCompleted;
   final bool enabled;
