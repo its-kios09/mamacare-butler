@@ -1,9 +1,12 @@
 //filename: phone_input_screen.dart
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mamacare_flutter/screens/auth/pin_login_screen.dart';
 import 'package:mamacare_flutter/screens/auth/pin_setup_screen.dart';
 
+import '../../main.dart';
 import '../../widgets/footer_widget.dart';
 import '../../widgets/important_links_widget.dart';
 
@@ -60,7 +63,6 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
     return null;
   }
-
   Future<void> _continue() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -68,19 +70,67 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
     final formattedPhone = _formatPhoneNumber(_phoneController.text);
 
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      if (kDebugMode) {
+        print('📞 Checking if user exists: $formattedPhone');
+      }
 
-    if (!mounted) return;
+      // 1. Check if user exists on backend
+      final userExists = await client.v1Auth.userExists(formattedPhone);
 
-    setState(() => _isLoading = false);
+      if (kDebugMode) {
+        print('✅ User exists: $userExists');
+      }
 
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => PinSetupScreen(phoneNumber: formattedPhone),
-      ),
-    );
+      if (!mounted) return;
+
+      if (userExists) {
+        // 2a. EXISTING USER → Go to PIN Login
+        setState(() => _isLoading = false);
+
+        if (kDebugMode) {
+          print('→ Navigating to PIN Login');
+        }
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => PinLoginScreen(
+              showBiometric: false,
+              phoneNumber: formattedPhone,
+            ),
+          ),
+        );
+      } else {
+        // 2b. NEW USER → Go to PIN Setup
+        setState(() => _isLoading = false);
+
+        if (kDebugMode) {
+          print('→ Navigating to PIN Setup');
+        }
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => PinSetupScreen(phoneNumber: formattedPhone),
+          ),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('❌ Error checking user: $e');
+      }
+
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Connection error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -38,53 +38,41 @@ class _BiometricSetupScreenState extends State<BiometricSetupScreen> {
     if (!mounted) return;
 
     if (success) {
-      _showSuccessDialog();
+      _showSuccessMessage();
     } else {
-      _showErrorDialog();
+      _showErrorMessage();
     }
 
     setState(() => _isLoading = false);
   }
 
-  void _showSuccessDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Success!'),
-        content: const Text('Biometric authentication enabled successfully.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _navigateToHome();
-            },
-            child: const Text('Continue'),
-          ),
-        ],
+  void _showSuccessMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('✓ Biometric authentication enabled!'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
       ),
     );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) _navigateToHome();
+    });
   }
 
-  void _showErrorDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Failed'),
-        content: const Text(
-            'Could not enable biometric authentication. You can enable it later in settings.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _navigateToHome();
-            },
-            child: const Text('Continue'),
-          ),
-        ],
+  void _showErrorMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Could not enable biometric. You can enable it later in settings.'),
+        backgroundColor: Colors.orange,
+        duration: Duration(seconds: 3),
       ),
     );
-  }
 
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) _navigateToHome();
+    });
+  }
   void _navigateToHome() {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -99,7 +87,7 @@ class _BiometricSetupScreenState extends State<BiometricSetupScreen> {
         title: const Text('Setup Complete'),
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: EdgeInsets.all(24.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -136,7 +124,7 @@ class _BiometricSetupScreenState extends State<BiometricSetupScreen> {
                 ),
               ),
 
-              const Spacer(),
+              SizedBox(height: 100.h),
 
               if (_isLoading)
                 const Center(child: CircularProgressIndicator())

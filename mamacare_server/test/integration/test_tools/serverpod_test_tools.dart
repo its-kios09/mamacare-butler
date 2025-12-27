@@ -523,6 +523,37 @@ class _V1AuthEndpoint {
       }
     });
   }
+
+  _i3.Future<bool> userExists(
+    _i1.TestSessionBuilder sessionBuilder,
+    String phoneNumber,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Auth',
+            method: 'userExists',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Auth',
+          methodName: 'userExists',
+          parameters: _i1.testObjectToJson({'phoneNumber': phoneNumber}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
 }
 
 class _GreetingEndpoint {

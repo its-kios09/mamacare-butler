@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:mamacare_flutter/models/user.dart';
 import 'package:mamacare_flutter/services/storage_service.dart';
+import 'package:mamacare_flutter/main.dart';
+
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -29,33 +31,96 @@ class AuthService {
 
   Future<bool> verifyPin(String pin) async {
     final storedHash = await _storage.getPinHash();
-    if (storedHash == null) return false;
+
+    if (kDebugMode) {
+      print('🔑 Stored hash: $storedHash');
+    }
+
+    if (storedHash == null) {
+      if (kDebugMode) {
+        print('❌ No PIN hash found in storage');
+      }
+      return false;
+    }
 
     final enteredHash = hashPin(pin);
+
+    if (kDebugMode) {
+      print('🔑 Entered hash: $enteredHash');
+      print('🔑 Match: ${storedHash == enteredHash}');
+    }
+
     return storedHash == enteredHash;
   }
-
   Future<bool> setupPin(String phoneNumber, String pin) async {
     try {
+      if (kDebugMode) {
+        print('📝 Setting up PIN for: $phoneNumber');
+      }
+
+      // 1. Register user on backend
+      final response = await client.v1Auth.registerUser(phoneNumber);
+
+      // 2. Check if registration succeeded
+      if (!response.success) {
+        if (kDebugMode) {
+          print('❌ Registration failed: ${response.error?.message}');
+        }
+        return false;
+      }
+
+      // 3. Backend registration successful, save PIN locally
+      if (kDebugMode) {
+        print('✅ User registered on backend: ${response.user?.phoneNumber}');
+      }
+
       final pinHash = hashPin(pin);
+
+      if (kDebugMode) {
+        print('🔑 PIN hash to save: $pinHash');
+      }
+
       await _storage.savePinHash(pinHash);
+
+      // Verify it was saved
+      final savedHash = await _storage.getPinHash();
+      if (kDebugMode) {
+        print('🔑 Verified saved hash: $savedHash');
+        print('🔑 Save successful: ${savedHash == pinHash}');
+      }
+
       await _storage.savePhoneNumber(phoneNumber);
 
       final token = _generateToken(phoneNumber);
       await _storage.saveAuthToken(token);
 
+      if (kDebugMode) {
+        print('✅ Setup complete!');
+      }
+
       return true;
     } catch (e) {
+      if (kDebugMode) {
+        print('❌ Setup PIN failed: $e');
+      }
       return false;
     }
   }
-
   Future<bool> loginWithPin(String pin) async {
     try {
       final isValid = await verifyPin(pin);
 
+      if (kDebugMode) {
+        print('🔐 PIN verification: $isValid');
+      }
+
       if (isValid) {
-        final phone = _storage.getPhoneNumber();
+        final phone = await _storage.getPhoneNumber();  // ← Add await here!
+
+        if (kDebugMode) {
+          print('📞 Stored phone: $phone');
+        }
+
         if (phone != null) {
           _currentUser = User(
             id: 1,
@@ -63,16 +128,27 @@ class AuthService {
             name: 'Test User',
             createdAt: DateTime.now(),
           );
+
+          if (kDebugMode) {
+            print('✅ Login successful');
+          }
+
           return true;
         }
       }
 
+      if (kDebugMode) {
+        print('❌ Login failed');
+      }
+
       return false;
     } catch (e) {
+      if (kDebugMode) {
+        print('❌ Login error: $e');
+      }
       return false;
     }
   }
-
   Future<bool> canUseBiometric() async {
     try {
       final canCheck = await _localAuth.canCheckBiometrics;

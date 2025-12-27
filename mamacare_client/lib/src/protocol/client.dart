@@ -235,7 +235,6 @@ class EndpointJwtRefresh extends _i4.EndpointRefreshJwtTokens {
   );
 }
 
-/// V1 Authentication Endpoint
 /// {@category Endpoint}
 class EndpointV1Auth extends _i2.EndpointRef {
   EndpointV1Auth(_i2.EndpointCaller caller) : super(caller);
@@ -243,7 +242,6 @@ class EndpointV1Auth extends _i2.EndpointRef {
   @override
   String get name => 'v1Auth';
 
-  /// Register user with phone number
   _i3.Future<_i5.AuthResponse> registerUser(String phoneNumber) =>
       caller.callServerEndpoint<_i5.AuthResponse>(
         'v1Auth',
@@ -251,11 +249,17 @@ class EndpointV1Auth extends _i2.EndpointRef {
         {'phoneNumber': phoneNumber},
       );
 
-  /// Get user by phone number
   _i3.Future<_i6.User?> getUserByPhone(String phoneNumber) =>
       caller.callServerEndpoint<_i6.User?>(
         'v1Auth',
         'getUserByPhone',
+        {'phoneNumber': phoneNumber},
+      );
+
+  _i3.Future<bool> userExists(String phoneNumber) =>
+      caller.callServerEndpoint<bool>(
+        'v1Auth',
+        'userExists',
         {'phoneNumber': phoneNumber},
       );
 }

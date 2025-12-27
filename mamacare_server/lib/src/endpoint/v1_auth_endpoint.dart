@@ -1,11 +1,8 @@
 import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
 
-/// V1 Authentication Endpoint
 class V1AuthEndpoint extends Endpoint {
-  /// Register user with phone number
   Future<AuthResponse> registerUser(Session session, String phoneNumber) async {
-    // Validate phone number
     final validationError = _validatePhoneNumber(phoneNumber);
     if (validationError != null) {
       session.log('Invalid phone: $validationError', level: LogLevel.warning);
@@ -22,7 +19,6 @@ class V1AuthEndpoint extends Endpoint {
     final normalizedPhone = _normalizePhoneNumber(phoneNumber);
 
     try {
-      // Check if user already exists
       final existingUser = await User.db.findFirstRow(
         session,
         where: (t) => t.phoneNumber.equals(normalizedPhone),
@@ -36,7 +32,6 @@ class V1AuthEndpoint extends Endpoint {
         );
       }
 
-      // Create new user
       final user = User(
         phoneNumber: normalizedPhone,
         createdAt: DateTime.now(),
@@ -65,7 +60,6 @@ class V1AuthEndpoint extends Endpoint {
     }
   }
 
-  /// Get user by phone number
   Future<User?> getUserByPhone(Session session, String phoneNumber) async {
     final validationError = _validatePhoneNumber(phoneNumber);
     if (validationError != null) {
@@ -94,7 +88,32 @@ class V1AuthEndpoint extends Endpoint {
     }
   }
 
-  // Validation
+
+  Future<bool> userExists(Session session, String phoneNumber) async {
+    final validationError = _validatePhoneNumber(phoneNumber);
+    if (validationError != null) {
+      session.log('Invalid phone: $validationError', level: LogLevel.warning);
+      return false;
+    }
+
+    final normalizedPhone = _normalizePhoneNumber(phoneNumber);
+
+    try {
+      final user = await User.db.findFirstRow(
+        session,
+        where: (t) => t.phoneNumber.equals(normalizedPhone),
+      );
+
+      final exists = user != null;
+      session.log('User exists check: $normalizedPhone = $exists');
+
+      return exists;
+    } catch (e) {
+      session.log('Database error: $e', level: LogLevel.error);
+      return false;
+    }
+  }
+
   String? _validatePhoneNumber(String phoneNumber) {
     if (phoneNumber.trim().isEmpty) {
       return 'Phone number cannot be empty';
