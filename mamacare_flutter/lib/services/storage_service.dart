@@ -89,9 +89,17 @@ class StorageService {
     return getBool('biometric_enabled') ?? false;
   }
 
+  Future<void> saveUserId(int userId) async {
+    await saveString('user_id', userId.toString());
+  }
+
+  int? getUserId() {
+    final id = getString('user_id');
+    return id != null ? int.tryParse(id) : null;
+  }
+
   Future<void> logout() async {
-    // Only delete auth token, keep PIN and phone number
     await deleteSecure('auth_token');
-    // Don't clear everything - keep PIN and biometric settings
+    await remove('user_id');
   }
 }

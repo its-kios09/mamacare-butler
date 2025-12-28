@@ -1,0 +1,19 @@
+class: MaternalProfile
+table: maternal_profiles
+fields:
+  userId: int
+  fullName: String
+  expectedDueDate: DateTime
+  lastMenstrualPeriod: DateTime?
+  currentWeek: int
+  bloodType: String?
+  allergies: String?
+  medicalHistory: String?
+  emergencyContact: String?
+  emergencyPhone: String?
+  createdAt: DateTime
+  updatedAt: DateTime?
+indexes:
+  userId_idx:
+    fields: userId
+    unique: true

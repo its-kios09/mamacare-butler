@@ -1,11 +1,12 @@
-//filename: phone_input_screen.dart
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide kToolbarHeight;
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mamacare_flutter/screens/auth/pin_login_screen.dart';
 import 'package:mamacare_flutter/screens/auth/pin_setup_screen.dart';
 
+import '../../constants/constant.dart';
 import '../../main.dart';
 import '../../widgets/footer_widget.dart';
 import '../../widgets/important_links_widget.dart';
@@ -21,6 +22,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
   final _phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -63,35 +65,33 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
 
     return null;
   }
+
   Future<void> _continue() async {
-    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _errorMessage = null;
+    });
+
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter a valid phone number'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
     final formattedPhone = _formatPhoneNumber(_phoneController.text);
 
     try {
-      if (kDebugMode) {
-        print('📞 Checking if user exists: $formattedPhone');
-      }
-
-      // 1. Check if user exists on backend
       final userExists = await client.v1Auth.userExists(formattedPhone);
-
-      if (kDebugMode) {
-        print('✅ User exists: $userExists');
-      }
-
       if (!mounted) return;
 
       if (userExists) {
-        // 2a. EXISTING USER → Go to PIN Login
         setState(() => _isLoading = false);
-
-        if (kDebugMode) {
-          print('→ Navigating to PIN Login');
-        }
-
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => PinLoginScreen(
@@ -101,13 +101,7 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
           ),
         );
       } else {
-        // 2b. NEW USER → Go to PIN Setup
         setState(() => _isLoading = false);
-
-        if (kDebugMode) {
-          print('→ Navigating to PIN Setup');
-        }
-
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => PinSetupScreen(phoneNumber: formattedPhone),
@@ -115,126 +109,221 @@ class _PhoneInputScreenState extends State<PhoneInputScreen> {
         );
       }
     } catch (e) {
-      if (kDebugMode) {
-        print('❌ Error checking user: $e');
-      }
-
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Connection error: ${e.toString()}';
+      });
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Connection error: ${e.toString()}'),
+          content: Text(_errorMessage!),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 3),
         ),
       );
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome to MamaCare'),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(24.w),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(height: 40.h),
-
-                  Icon(
-                    Icons.phone_android,
-                    size: 80.sp,
-                    color: Theme.of(context).primaryColor,
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: kSystemPadding,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: kToolbarHeight),
+                Text(
+                  'Login',
+                  style: GoogleFonts.openSans(
+                    fontSize: ScreenUtil().setSp(28),
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
                   ),
+                ),
+                Text(
+                  'Digital Maternal Health Services (DMHS)',
+                  style: GoogleFonts.openSans(
+                    fontSize: ScreenUtil().setSp(12),
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+                const Divider(),
+                const SizedBox(height: 10),
+                const Text(
+                  'Provide the required details to log in',
+                  style: TextStyle(color: kTextGrey),
+                ),
+                const SizedBox(height: 15),
+                const Text(
+                  'Phone number',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 15),
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  style:TextStyle(fontSize: ScreenUtil().setSp(13)),
+                  decoration: InputDecoration(
+                    labelText: "Enter your phone number here...",
+                    labelStyle: TextStyle(
+                      color: kTextGrey,
+                      fontSize: ScreenUtil().setSp(15),
+                    ),
+                    prefixText: '+254 ',
+                    hintText: '0700000000',
+                    hintStyle: TextStyle(fontSize: ScreenUtil().setSp(13)),
+                    prefixIcon: Icon(Icons.phone, size: ScreenUtil().setSp(18)),
+                    filled: true,
+                    fillColor: Colors.grey[50],
+                    border: const OutlineInputBorder(),
+                    enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: kTextGrey),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: kTextGrey),
+                    ),
+                    errorBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
+                    focusedErrorBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red, width: 2),
+                    ),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(10),
+                  ],
+                  validator: _validatePhone,
+                ),
+                const SizedBox(height: 10),
 
-                  SizedBox(height: 32.h),
-
-                  Text(
-                    'Enter your phone number',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 24.sp,
-                      fontWeight: FontWeight.bold,
+                // Error message display
+                if (_errorMessage != null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.red.shade200),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 18),
+                          color: Colors.red,
+                          onPressed: () {
+                            setState(() {
+                              _errorMessage = null;
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
 
-                  SizedBox(height: 8.h),
+                const SizedBox(height: 20),
 
-                  Text(
-                    'We\'ll use this to secure your account',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-
-                  SizedBox(height: 40.h),
-
-                  TextFormField(
-                    controller: _phoneController,
-                    keyboardType: TextInputType.phone,
-                    autofocus: true,
-                    style: TextStyle(fontSize: 18.sp),
-                    decoration: InputDecoration(
-                      labelText: 'Phone Number',
-                      hintText: '0791660287',
-                      prefixText: '+254 ',
-                      prefixIcon: const Icon(Icons.phone),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[50],
-                    ),
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(10),
-                    ],
-                    validator: _validatePhone,
-                  ),
-
-                  SizedBox(height: 32.h),
-
-                  ElevatedButton(
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
                     onPressed: _isLoading ? null : _continue,
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 16.h),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
+                        borderRadius: BorderRadius.circular(5.r),
                       ),
+                      backgroundColor: _isLoading
+                          ? Colors.grey
+                          : kPrimaryColor,
+                      foregroundColor: Colors.white,
                     ),
                     child: _isLoading
-                        ? SizedBox(
-                      height: 20.h,
-                      width: 20.w,
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
+                        ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: 20.h,
+                          width: 20.w,
+                          child: const CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'Checking...',
+                          style: TextStyle(
+                            fontSize: 16.sp,
+                          ),
+                        ),
+                      ],
                     )
                         : Text(
                       'Continue',
                       style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 14.sp,
                       ),
                     ),
                   ),
+                ),
 
-                  SizedBox(height: 34.h),
-                            const Footer(
-                    hasPartners: false,
+                const SizedBox(height: 130),
+                const Center(
+                  child: Text(
+                    'Built with',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 15),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ImportantLinksWidget(
+                      title: 'Flutter',
+                      assetLink: 'assets/images/flutter.png',
+                    ),
+                    ImportantLinksWidget(
+                      title: 'Gemini AI',
+                      assetLink: 'assets/images/gemini.png',
+                    ),
+                    ImportantLinksWidget(
+                      title: 'ServerPod',
+                      assetLink: 'assets/images/serverpod.png',
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                const Footer(
+                  hasPartners: false,
+                ),
+              ],
             ),
           ),
         ),

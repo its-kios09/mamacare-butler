@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class ImportantLinksWidget extends StatelessWidget {
   const ImportantLinksWidget(
-      {super.key, required this.title, required this.assetLink});
-  final String title;
+      {super.key,  this.title, required this.assetLink});
+  final String? title;
   final String assetLink;
 
   @override
@@ -19,7 +19,7 @@ class ImportantLinksWidget extends StatelessWidget {
           height: 8,
         ),
         Text(
-          title,
+          title ?? '',
           style: const TextStyle(fontSize: 12, color: Colors.grey),
         ),
       ],
