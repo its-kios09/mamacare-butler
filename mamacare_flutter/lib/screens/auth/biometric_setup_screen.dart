@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mamacare_flutter/screens/auth/phone_input_screen.dart';
 
+import '../../main.dart';
 import '../../services/auth_service.dart';
+import '../../services/storage_service.dart';
 import '../home/home_screen.dart';
+import '../onboarding/maternal_profile_screen.dart';
 // filename: biomertic_setup_screen
 class BiometricSetupScreen extends StatefulWidget {
   const BiometricSetupScreen({super.key});
@@ -73,11 +77,50 @@ class _BiometricSetupScreenState extends State<BiometricSetupScreen> {
       if (mounted) _navigateToHome();
     });
   }
-  void _navigateToHome() {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-          (route) => false,
-    );
+  Future<void> _navigateToHome() async {
+    // Get user ID from storage
+    final userId = StorageService().getUserId();
+
+    if (userId == null) {
+      // No user ID, something went wrong - go to phone input
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const PhoneInputScreen()),
+            (route) => false,
+      );
+      return;
+    }
+
+    // Check if user has maternal profile
+    try {
+      final profile = await client.v1MaternalProfile.getProfile(userId);
+
+      if (!mounted) return;
+
+      if (profile == null) {
+        // No profile → Go to onboarding
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => MaternalProfileScreen(userId: userId),
+          ),
+              (route) => false,
+        );
+      } else {
+        // Has profile → Go to home
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+              (route) => false,
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => MaternalProfileScreen(userId: userId),
+        ),
+            (route) => false,
+      );
+    }
   }
 
   @override
@@ -148,7 +191,7 @@ class _BiometricSetupScreenState extends State<BiometricSetupScreen> {
                 style: OutlinedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12.r),
+                    borderRadius: BorderRadius.circular(5.r),
                   ),
                 ),
                 child: Text(_canUseBiometric ? 'Skip for Now' : 'Continue'),

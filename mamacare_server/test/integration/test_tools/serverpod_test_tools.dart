@@ -19,7 +19,8 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
 import 'package:mamacare_server/src/generated/auth_response.dart' as _i5;
 import 'package:mamacare_server/src/generated/user.dart' as _i6;
-import 'package:mamacare_server/src/generated/greetings/greeting.dart' as _i7;
+import 'package:mamacare_server/src/generated/maternal_profile.dart' as _i7;
+import 'package:mamacare_server/src/generated/greetings/greeting.dart' as _i8;
 import 'package:mamacare_server/src/generated/protocol.dart';
 import 'package:mamacare_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -133,6 +134,8 @@ class TestEndpoints {
 
   late final _V1AuthEndpoint v1Auth;
 
+  late final _V1MaternalProfileEndpoint v1MaternalProfile;
+
   late final _GreetingEndpoint greeting;
 }
 
@@ -152,6 +155,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     v1Auth = _V1AuthEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    v1MaternalProfile = _V1MaternalProfileEndpoint(
       endpoints,
       serializationManager,
     );
@@ -556,6 +563,97 @@ class _V1AuthEndpoint {
   }
 }
 
+class _V1MaternalProfileEndpoint {
+  _V1MaternalProfileEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i7.MaternalProfile?> saveProfile(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+    String fullName,
+    DateTime expectedDueDate,
+    DateTime? lastMenstrualPeriod,
+    String? bloodType,
+    String? allergies,
+    String? medicalHistory,
+    String? emergencyContact,
+    String? emergencyPhone,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1MaternalProfile',
+            method: 'saveProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1MaternalProfile',
+          methodName: 'saveProfile',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'fullName': fullName,
+            'expectedDueDate': expectedDueDate,
+            'lastMenstrualPeriod': lastMenstrualPeriod,
+            'bloodType': bloodType,
+            'allergies': allergies,
+            'medicalHistory': medicalHistory,
+            'emergencyContact': emergencyContact,
+            'emergencyPhone': emergencyPhone,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i7.MaternalProfile?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i7.MaternalProfile?> getProfile(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1MaternalProfile',
+            method: 'getProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1MaternalProfile',
+          methodName: 'getProfile',
+          parameters: _i1.testObjectToJson({'userId': userId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i7.MaternalProfile?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _GreetingEndpoint {
   _GreetingEndpoint(
     this._endpointDispatch,
@@ -566,7 +664,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i7.Greeting> hello(
+  _i3.Future<_i8.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -589,7 +687,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.Greeting>);
+                as _i3.Future<_i8.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
