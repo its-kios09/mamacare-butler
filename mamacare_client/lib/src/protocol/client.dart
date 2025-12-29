@@ -18,9 +18,10 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
 import 'package:mamacare_client/src/protocol/auth_response.dart' as _i5;
 import 'package:mamacare_client/src/protocol/user.dart' as _i6;
-import 'package:mamacare_client/src/protocol/maternal_profile.dart' as _i7;
-import 'package:mamacare_client/src/protocol/greetings/greeting.dart' as _i8;
-import 'protocol.dart' as _i9;
+import 'package:mamacare_client/src/protocol/kick_session.dart' as _i7;
+import 'package:mamacare_client/src/protocol/maternal_profile.dart' as _i8;
+import 'package:mamacare_client/src/protocol/greetings/greeting.dart' as _i9;
+import 'protocol.dart' as _i10;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -266,6 +267,65 @@ class EndpointV1Auth extends _i2.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointV1KickCounter extends _i2.EndpointRef {
+  EndpointV1KickCounter(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'v1KickCounter';
+
+  /// Save a kick counting session
+  _i3.Future<_i7.KickSession?> saveKickSession(
+    int userId,
+    int kickCount,
+    int durationMinutes,
+    String? notes,
+  ) => caller.callServerEndpoint<_i7.KickSession?>(
+    'v1KickCounter',
+    'saveKickSession',
+    {
+      'userId': userId,
+      'kickCount': kickCount,
+      'durationMinutes': durationMinutes,
+      'notes': notes,
+    },
+  );
+
+  /// Get recent kick sessions for a user
+  _i3.Future<List<_i7.KickSession>> getRecentKicks(
+    int userId,
+    int days,
+  ) => caller.callServerEndpoint<List<_i7.KickSession>>(
+    'v1KickCounter',
+    'getRecentKicks',
+    {
+      'userId': userId,
+      'days': days,
+    },
+  );
+
+  /// Get kick statistics for a user
+  _i3.Future<Map<String, dynamic>> getKickStats(
+    int userId,
+    int days,
+  ) => caller.callServerEndpoint<Map<String, dynamic>>(
+    'v1KickCounter',
+    'getKickStats',
+    {
+      'userId': userId,
+      'days': days,
+    },
+  );
+
+  /// Analyze kick pattern (simple version, will add Gemini later)
+  _i3.Future<String> analyzeKickPattern(int userId) =>
+      caller.callServerEndpoint<String>(
+        'v1KickCounter',
+        'analyzeKickPattern',
+        {'userId': userId},
+      );
+}
+
+/// {@category Endpoint}
 class EndpointV1MaternalProfile extends _i2.EndpointRef {
   EndpointV1MaternalProfile(_i2.EndpointCaller caller) : super(caller);
 
@@ -273,7 +333,7 @@ class EndpointV1MaternalProfile extends _i2.EndpointRef {
   String get name => 'v1MaternalProfile';
 
   /// Create or update maternal profile
-  _i3.Future<_i7.MaternalProfile?> saveProfile(
+  _i3.Future<_i8.MaternalProfile?> saveProfile(
     int userId,
     String fullName,
     DateTime expectedDueDate,
@@ -283,7 +343,7 @@ class EndpointV1MaternalProfile extends _i2.EndpointRef {
     String? medicalHistory,
     String? emergencyContact,
     String? emergencyPhone,
-  ) => caller.callServerEndpoint<_i7.MaternalProfile?>(
+  ) => caller.callServerEndpoint<_i8.MaternalProfile?>(
     'v1MaternalProfile',
     'saveProfile',
     {
@@ -300,8 +360,8 @@ class EndpointV1MaternalProfile extends _i2.EndpointRef {
   );
 
   /// Get maternal profile by user ID
-  _i3.Future<_i7.MaternalProfile?> getProfile(int userId) =>
-      caller.callServerEndpoint<_i7.MaternalProfile?>(
+  _i3.Future<_i8.MaternalProfile?> getProfile(int userId) =>
+      caller.callServerEndpoint<_i8.MaternalProfile?>(
         'v1MaternalProfile',
         'getProfile',
         {'userId': userId},
@@ -318,8 +378,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i8.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i8.Greeting>(
+  _i3.Future<_i9.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i9.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -357,7 +417,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i9.Protocol(),
+         _i10.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -369,6 +429,7 @@ class Client extends _i2.ServerpodClientShared {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     v1Auth = EndpointV1Auth(this);
+    v1KickCounter = EndpointV1KickCounter(this);
     v1MaternalProfile = EndpointV1MaternalProfile(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
@@ -379,6 +440,8 @@ class Client extends _i2.ServerpodClientShared {
   late final EndpointJwtRefresh jwtRefresh;
 
   late final EndpointV1Auth v1Auth;
+
+  late final EndpointV1KickCounter v1KickCounter;
 
   late final EndpointV1MaternalProfile v1MaternalProfile;
 
@@ -391,6 +454,7 @@ class Client extends _i2.ServerpodClientShared {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
     'v1Auth': v1Auth,
+    'v1KickCounter': v1KickCounter,
     'v1MaternalProfile': v1MaternalProfile,
     'greeting': greeting,
   };
