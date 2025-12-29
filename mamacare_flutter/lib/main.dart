@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mamacare_client/mamacare_client.dart';
+import 'package:mamacare_flutter/screens/health/health_trends_screen.dart';
 import 'package:mamacare_flutter/screens/onboarding/maternal_profile_screen.dart';
 import 'package:serverpod_flutter/serverpod_flutter.dart';
 
@@ -54,6 +55,9 @@ class MyApp extends StatelessWidget {
               foregroundColor: Colors.black,
             ),
           ),
+          routes: {
+            '/health-trends': (context) => const HealthTrendsScreen(),
+          },
           home: const SplashScreen(),
         );
       },

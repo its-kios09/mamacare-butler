@@ -1,0 +1,12 @@
+class: KickSession
+table: kick_sessions
+fields:
+  userId: int
+  sessionDate: DateTime
+  kickCount: int
+  durationMinutes: int
+  notes: String?
+  createdAt: DateTime, default=now
+indexes:
+  userId_date_idx:
+    fields: userId, sessionDate

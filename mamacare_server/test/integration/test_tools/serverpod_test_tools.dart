@@ -19,8 +19,9 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
 import 'package:mamacare_server/src/generated/auth_response.dart' as _i5;
 import 'package:mamacare_server/src/generated/user.dart' as _i6;
-import 'package:mamacare_server/src/generated/maternal_profile.dart' as _i7;
-import 'package:mamacare_server/src/generated/greetings/greeting.dart' as _i8;
+import 'package:mamacare_server/src/generated/kick_session.dart' as _i7;
+import 'package:mamacare_server/src/generated/maternal_profile.dart' as _i8;
+import 'package:mamacare_server/src/generated/greetings/greeting.dart' as _i9;
 import 'package:mamacare_server/src/generated/protocol.dart';
 import 'package:mamacare_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -134,6 +135,8 @@ class TestEndpoints {
 
   late final _V1AuthEndpoint v1Auth;
 
+  late final _V1KickCounterEndpoint v1KickCounter;
+
   late final _V1MaternalProfileEndpoint v1MaternalProfile;
 
   late final _GreetingEndpoint greeting;
@@ -155,6 +158,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     v1Auth = _V1AuthEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    v1KickCounter = _V1KickCounterEndpoint(
       endpoints,
       serializationManager,
     );
@@ -563,6 +570,157 @@ class _V1AuthEndpoint {
   }
 }
 
+class _V1KickCounterEndpoint {
+  _V1KickCounterEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i7.KickSession?> saveKickSession(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+    int kickCount,
+    int durationMinutes,
+    String? notes,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1KickCounter',
+            method: 'saveKickSession',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1KickCounter',
+          methodName: 'saveKickSession',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'kickCount': kickCount,
+            'durationMinutes': durationMinutes,
+            'notes': notes,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i7.KickSession?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i7.KickSession>> getRecentKicks(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+    int days,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1KickCounter',
+            method: 'getRecentKicks',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1KickCounter',
+          methodName: 'getRecentKicks',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'days': days,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i7.KickSession>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<Map<String, dynamic>> getKickStats(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+    int days,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1KickCounter',
+            method: 'getKickStats',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1KickCounter',
+          methodName: 'getKickStats',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'days': days,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<Map<String, dynamic>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<String> analyzeKickPattern(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1KickCounter',
+            method: 'analyzeKickPattern',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1KickCounter',
+          methodName: 'analyzeKickPattern',
+          parameters: _i1.testObjectToJson({'userId': userId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<String>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _V1MaternalProfileEndpoint {
   _V1MaternalProfileEndpoint(
     this._endpointDispatch,
@@ -573,7 +731,7 @@ class _V1MaternalProfileEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i7.MaternalProfile?> saveProfile(
+  _i3.Future<_i8.MaternalProfile?> saveProfile(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
     String fullName,
@@ -614,7 +772,7 @@ class _V1MaternalProfileEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.MaternalProfile?>);
+                as _i3.Future<_i8.MaternalProfile?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -622,7 +780,7 @@ class _V1MaternalProfileEndpoint {
     });
   }
 
-  _i3.Future<_i7.MaternalProfile?> getProfile(
+  _i3.Future<_i8.MaternalProfile?> getProfile(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
   ) async {
@@ -645,7 +803,7 @@ class _V1MaternalProfileEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.MaternalProfile?>);
+                as _i3.Future<_i8.MaternalProfile?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -664,7 +822,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i8.Greeting> hello(
+  _i3.Future<_i9.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -687,7 +845,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i8.Greeting>);
+                as _i3.Future<_i9.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
