@@ -1,5 +1,6 @@
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:dotenv/dotenv.dart';
+import 'dart:convert';
 
 class GeminiService {
   late final GenerativeModel _model;
@@ -76,7 +77,6 @@ class GeminiService {
     }
 
     // Format session data
-   // Format session data
     final sessionDetails = sessions
         .take(5)
         .toList()
@@ -165,6 +165,104 @@ Be warm, reassuring, and clear. Use mother-friendly language. Maximum 80 words t
         return 'AI analysis temporarily unavailable. Your average is $avgKicks kicks. '
             'Normal range is 10-30 kicks in 2 hours. Contact your doctor if concerned.';
       }
+    }
+  }
+
+  /// Ultrasound analysis - Vision model
+  Future<Map<String, dynamic>> analyzeUltrasound({
+    required String imageBase64,
+    required int pregnancyWeek,
+  }) async {
+    final prompt =
+        '''
+You are Dr. MamaCare AI, a maternal health expert analyzing an ultrasound scan.
+
+PREGNANCY CONTEXT:
+- Week: $pregnancyWeek of 40
+- Trimester: ${_getTrimester(pregnancyWeek)}
+
+TASK:
+Carefully examine this ultrasound image and extract ALL visible measurements.
+
+LOOK FOR these common measurements (mark as "Not visible" if you cannot see them):
+- GA (Gestational Age)
+- BPD (Biparietal Diameter) - head width
+- HC (Head Circumference)
+- AC (Abdominal Circumference)
+- FL (Femur Length) - thigh bone
+- EFW (Estimated Fetal Weight)
+- AFI (Amniotic Fluid Index)
+- Placenta location
+
+PROVIDE response as JSON:
+{
+  "measurements": {
+    "BPD": "7.2 cm" or "Not visible",
+    "FL": "5.4 cm" or "Not visible",
+    "AC": "24.3 cm" or "Not visible",
+    "EFW": "1.2 kg" or "Not visible"
+  },
+  "explanation": "Your detailed explanation here...",
+  "nextScanRecommended": {
+    "week": 32,
+    "date": "2026-01-28",
+    "reason": "Growth and position check"
+  }
+}
+
+EXPLANATION REQUIREMENTS:
+1. Start with overall assessment (Excellent/Good/Normal/Attention needed)
+2. Explain each measurement in mother-friendly language
+3. Compare to expected values for week $pregnancyWeek
+4. Be warm, reassuring, and clear
+5. Mention if follow-up needed
+6. Maximum 200 words
+
+If the image is unclear or not an ultrasound, say so honestly.
+''';
+
+    try {
+      // Decode base64 to bytes
+      final bytes = base64Decode(imageBase64);
+
+      final response = await _model.generateContent([
+        Content.multi([
+          TextPart(prompt),
+          DataPart('image/jpeg', bytes),
+        ]),
+      ]);
+
+      final text = response.text ?? '';
+
+      // Try to parse JSON from response
+      try {
+        final jsonMatch = RegExp(r'\{[\s\S]*\}').firstMatch(text);
+        if (jsonMatch != null) {
+          final jsonStr = jsonMatch.group(0)!;
+          final parsed = json.decode(jsonStr) as Map<String, dynamic>;
+
+          return parsed;
+        }
+      } catch (e) {
+        print('JSON parse error: $e');
+      }
+
+      // Fallback if JSON parsing fails
+      return {
+        'measurements': {},
+        'explanation': text.isNotEmpty
+            ? text
+            : 'Unable to analyze ultrasound image. Please ensure the image is clear.',
+        'nextScanRecommended': null,
+      };
+    } catch (e) {
+      print('Gemini Vision error: $e');
+      return {
+        'measurements': {},
+        'explanation':
+            'Unable to analyze ultrasound at this time. Error: ${e.toString()}',
+        'nextScanRecommended': null,
+      };
     }
   }
 }

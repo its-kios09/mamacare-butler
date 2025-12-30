@@ -8,5 +8,5 @@ fields:
   notes: String?
   createdAt: DateTime, default=now
 indexes:
-  userId_date_idx:
+  kick_userId_date_idx:
     fields: userId, sessionDate
