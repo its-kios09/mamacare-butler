@@ -1,0 +1,15 @@
+class: UltrasoundScan
+table: ultrasound_scans
+fields:
+  userId: int
+  scanDate: DateTime
+  pregnancyWeek: int
+  imageBase64: String
+  measurements: String
+  aiExplanation: String
+  nextScanWeek: int?
+  nextScanDate: DateTime?
+  createdAt: DateTime, default=now
+indexes:
+  ultrasound_userId_date_idx:
+    fields: userId, scanDate

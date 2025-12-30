@@ -21,7 +21,8 @@ import 'package:mamacare_server/src/generated/auth_response.dart' as _i5;
 import 'package:mamacare_server/src/generated/user.dart' as _i6;
 import 'package:mamacare_server/src/generated/kick_session.dart' as _i7;
 import 'package:mamacare_server/src/generated/maternal_profile.dart' as _i8;
-import 'package:mamacare_server/src/generated/greetings/greeting.dart' as _i9;
+import 'package:mamacare_server/src/generated/ultrasound_scan.dart' as _i9;
+import 'package:mamacare_server/src/generated/greetings/greeting.dart' as _i10;
 import 'package:mamacare_server/src/generated/protocol.dart';
 import 'package:mamacare_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -139,6 +140,8 @@ class TestEndpoints {
 
   late final _V1MaternalProfileEndpoint v1MaternalProfile;
 
+  late final _V1UltrasoundEndpoint v1Ultrasound;
+
   late final _GreetingEndpoint greeting;
 }
 
@@ -166,6 +169,10 @@ class _InternalTestEndpoints extends TestEndpoints
       serializationManager,
     );
     v1MaternalProfile = _V1MaternalProfileEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    v1Ultrasound = _V1UltrasoundEndpoint(
       endpoints,
       serializationManager,
     );
@@ -816,6 +823,130 @@ class _V1MaternalProfileEndpoint {
   }
 }
 
+class _V1UltrasoundEndpoint {
+  _V1UltrasoundEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<Map<String, dynamic>> analyzeUltrasound(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+    String imageBase64,
+    int pregnancyWeek,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Ultrasound',
+            method: 'analyzeUltrasound',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Ultrasound',
+          methodName: 'analyzeUltrasound',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'imageBase64': imageBase64,
+            'pregnancyWeek': pregnancyWeek,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<Map<String, dynamic>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i9.UltrasoundScan?> saveUltrasoundScan(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+    int pregnancyWeek,
+    String imageBase64,
+    String measurements,
+    String aiExplanation,
+    int? nextScanWeek,
+    DateTime? nextScanDate,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Ultrasound',
+            method: 'saveUltrasoundScan',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Ultrasound',
+          methodName: 'saveUltrasoundScan',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'pregnancyWeek': pregnancyWeek,
+            'imageBase64': imageBase64,
+            'measurements': measurements,
+            'aiExplanation': aiExplanation,
+            'nextScanWeek': nextScanWeek,
+            'nextScanDate': nextScanDate,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i9.UltrasoundScan?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i9.UltrasoundScan>> getUserScans(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Ultrasound',
+            method: 'getUserScans',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Ultrasound',
+          methodName: 'getUserScans',
+          parameters: _i1.testObjectToJson({'userId': userId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i9.UltrasoundScan>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _GreetingEndpoint {
   _GreetingEndpoint(
     this._endpointDispatch,
@@ -826,7 +957,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i9.Greeting> hello(
+  _i3.Future<_i10.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -849,7 +980,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i9.Greeting>);
+                as _i3.Future<_i10.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
