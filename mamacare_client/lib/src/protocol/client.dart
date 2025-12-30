@@ -20,8 +20,9 @@ import 'package:mamacare_client/src/protocol/auth_response.dart' as _i5;
 import 'package:mamacare_client/src/protocol/user.dart' as _i6;
 import 'package:mamacare_client/src/protocol/kick_session.dart' as _i7;
 import 'package:mamacare_client/src/protocol/maternal_profile.dart' as _i8;
-import 'package:mamacare_client/src/protocol/greetings/greeting.dart' as _i9;
-import 'protocol.dart' as _i10;
+import 'package:mamacare_client/src/protocol/ultrasound_scan.dart' as _i9;
+import 'package:mamacare_client/src/protocol/greetings/greeting.dart' as _i10;
+import 'protocol.dart' as _i11;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -373,6 +374,60 @@ class EndpointV1MaternalProfile extends _i2.EndpointRef {
       );
 }
 
+/// {@category Endpoint}
+class EndpointV1Ultrasound extends _i2.EndpointRef {
+  EndpointV1Ultrasound(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'v1Ultrasound';
+
+  /// Analyze ultrasound image with Gemini Vision
+  _i3.Future<Map<String, dynamic>> analyzeUltrasound(
+    int userId,
+    String imageBase64,
+    int pregnancyWeek,
+  ) => caller.callServerEndpoint<Map<String, dynamic>>(
+    'v1Ultrasound',
+    'analyzeUltrasound',
+    {
+      'userId': userId,
+      'imageBase64': imageBase64,
+      'pregnancyWeek': pregnancyWeek,
+    },
+  );
+
+  /// Save ultrasound scan record
+  _i3.Future<_i9.UltrasoundScan?> saveUltrasoundScan(
+    int userId,
+    int pregnancyWeek,
+    String imageBase64,
+    String measurements,
+    String aiExplanation,
+    int? nextScanWeek,
+    DateTime? nextScanDate,
+  ) => caller.callServerEndpoint<_i9.UltrasoundScan?>(
+    'v1Ultrasound',
+    'saveUltrasoundScan',
+    {
+      'userId': userId,
+      'pregnancyWeek': pregnancyWeek,
+      'imageBase64': imageBase64,
+      'measurements': measurements,
+      'aiExplanation': aiExplanation,
+      'nextScanWeek': nextScanWeek,
+      'nextScanDate': nextScanDate,
+    },
+  );
+
+  /// Get user's ultrasound history
+  _i3.Future<List<_i9.UltrasoundScan>> getUserScans(int userId) =>
+      caller.callServerEndpoint<List<_i9.UltrasoundScan>>(
+        'v1Ultrasound',
+        'getUserScans',
+        {'userId': userId},
+      );
+}
+
 /// This is an example endpoint that returns a greeting message through
 /// its [hello] method.
 /// {@category Endpoint}
@@ -383,8 +438,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i9.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i9.Greeting>(
+  _i3.Future<_i10.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i10.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -422,7 +477,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i10.Protocol(),
+         _i11.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -436,6 +491,7 @@ class Client extends _i2.ServerpodClientShared {
     v1Auth = EndpointV1Auth(this);
     v1KickCounter = EndpointV1KickCounter(this);
     v1MaternalProfile = EndpointV1MaternalProfile(this);
+    v1Ultrasound = EndpointV1Ultrasound(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
   }
@@ -450,6 +506,8 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointV1MaternalProfile v1MaternalProfile;
 
+  late final EndpointV1Ultrasound v1Ultrasound;
+
   late final EndpointGreeting greeting;
 
   late final Modules modules;
@@ -461,6 +519,7 @@ class Client extends _i2.ServerpodClientShared {
     'v1Auth': v1Auth,
     'v1KickCounter': v1KickCounter,
     'v1MaternalProfile': v1MaternalProfile,
+    'v1Ultrasound': v1Ultrasound,
     'greeting': greeting,
   };
 

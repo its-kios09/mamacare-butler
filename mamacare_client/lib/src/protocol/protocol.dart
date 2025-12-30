@@ -16,17 +16,20 @@ import 'auth_response.dart' as _i3;
 import 'greetings/greeting.dart' as _i4;
 import 'kick_session.dart' as _i5;
 import 'maternal_profile.dart' as _i6;
-import 'user.dart' as _i7;
-import 'package:mamacare_client/src/protocol/kick_session.dart' as _i8;
+import 'ultrasound_scan.dart' as _i7;
+import 'user.dart' as _i8;
+import 'package:mamacare_client/src/protocol/kick_session.dart' as _i9;
+import 'package:mamacare_client/src/protocol/ultrasound_scan.dart' as _i10;
 import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart'
-    as _i9;
+    as _i11;
 import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
-    as _i10;
+    as _i12;
 export 'auth_exception.dart';
 export 'auth_response.dart';
 export 'greetings/greeting.dart';
 export 'kick_session.dart';
 export 'maternal_profile.dart';
+export 'ultrasound_scan.dart';
 export 'user.dart';
 export 'client.dart';
 
@@ -79,8 +82,11 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i6.MaternalProfile) {
       return _i6.MaternalProfile.fromJson(data) as T;
     }
-    if (t == _i7.User) {
-      return _i7.User.fromJson(data) as T;
+    if (t == _i7.UltrasoundScan) {
+      return _i7.UltrasoundScan.fromJson(data) as T;
+    }
+    if (t == _i8.User) {
+      return _i8.User.fromJson(data) as T;
     }
     if (t == _i1.getType<_i2.AuthException?>()) {
       return (data != null ? _i2.AuthException.fromJson(data) : null) as T;
@@ -97,11 +103,14 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i1.getType<_i6.MaternalProfile?>()) {
       return (data != null ? _i6.MaternalProfile.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i7.User?>()) {
-      return (data != null ? _i7.User.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i7.UltrasoundScan?>()) {
+      return (data != null ? _i7.UltrasoundScan.fromJson(data) : null) as T;
     }
-    if (t == List<_i8.KickSession>) {
-      return (data as List).map((e) => deserialize<_i8.KickSession>(e)).toList()
+    if (t == _i1.getType<_i8.User?>()) {
+      return (data != null ? _i8.User.fromJson(data) : null) as T;
+    }
+    if (t == List<_i9.KickSession>) {
+      return (data as List).map((e) => deserialize<_i9.KickSession>(e)).toList()
           as T;
     }
     if (t == Map<String, dynamic>) {
@@ -110,11 +119,17 @@ class Protocol extends _i1.SerializationManager {
           )
           as T;
     }
+    if (t == List<_i10.UltrasoundScan>) {
+      return (data as List)
+              .map((e) => deserialize<_i10.UltrasoundScan>(e))
+              .toList()
+          as T;
+    }
     try {
-      return _i9.Protocol().deserialize<T>(data, t);
+      return _i11.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     try {
-      return _i10.Protocol().deserialize<T>(data, t);
+      return _i12.Protocol().deserialize<T>(data, t);
     } on _i1.DeserializationTypeNotFoundException catch (_) {}
     return super.deserialize<T>(data, t);
   }
@@ -126,7 +141,8 @@ class Protocol extends _i1.SerializationManager {
       _i4.Greeting => 'Greeting',
       _i5.KickSession => 'KickSession',
       _i6.MaternalProfile => 'MaternalProfile',
-      _i7.User => 'User',
+      _i7.UltrasoundScan => 'UltrasoundScan',
+      _i8.User => 'User',
       _ => null,
     };
   }
@@ -151,14 +167,16 @@ class Protocol extends _i1.SerializationManager {
         return 'KickSession';
       case _i6.MaternalProfile():
         return 'MaternalProfile';
-      case _i7.User():
+      case _i7.UltrasoundScan():
+        return 'UltrasoundScan';
+      case _i8.User():
         return 'User';
     }
-    className = _i9.Protocol().getClassNameForObject(data);
+    className = _i11.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_idp.$className';
     }
-    className = _i10.Protocol().getClassNameForObject(data);
+    className = _i12.Protocol().getClassNameForObject(data);
     if (className != null) {
       return 'serverpod_auth_core.$className';
     }
@@ -186,16 +204,19 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'MaternalProfile') {
       return deserialize<_i6.MaternalProfile>(data['data']);
     }
+    if (dataClassName == 'UltrasoundScan') {
+      return deserialize<_i7.UltrasoundScan>(data['data']);
+    }
     if (dataClassName == 'User') {
-      return deserialize<_i7.User>(data['data']);
+      return deserialize<_i8.User>(data['data']);
     }
     if (dataClassName.startsWith('serverpod_auth_idp.')) {
       data['className'] = dataClassName.substring(19);
-      return _i9.Protocol().deserializeByClassName(data);
+      return _i11.Protocol().deserializeByClassName(data);
     }
     if (dataClassName.startsWith('serverpod_auth_core.')) {
       data['className'] = dataClassName.substring(20);
-      return _i10.Protocol().deserializeByClassName(data);
+      return _i12.Protocol().deserializeByClassName(data);
     }
     return super.deserializeByClassName(data);
   }
