@@ -10,6 +10,9 @@ dependencies:
   http: ^1.6.0
   serverpod: 3.1.1
   serverpod_auth_idp_server: 3.1.1
+  serverpod_auth_core_server: ^3.1.1
+  google_generative_ai: ^0.4.6
+  dotenv: ^4.2.0
 
 dev_dependencies:
   lints: '>=3.0.0 <7.0.0'
