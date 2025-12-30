@@ -316,13 +316,18 @@ class EndpointV1KickCounter extends _i2.EndpointRef {
     },
   );
 
-  /// Analyze kick pattern (simple version, will add Gemini later)
-  _i3.Future<String> analyzeKickPattern(int userId) =>
-      caller.callServerEndpoint<String>(
-        'v1KickCounter',
-        'analyzeKickPattern',
-        {'userId': userId},
-      );
+  /// Get AI-powered kick pattern analysis using Gemini
+  _i3.Future<String> getAIInsight(
+    int userId,
+    int pregnancyWeek,
+  ) => caller.callServerEndpoint<String>(
+    'v1KickCounter',
+    'getAIInsight',
+    {
+      'userId': userId,
+      'pregnancyWeek': pregnancyWeek,
+    },
+  );
 }
 
 /// {@category Endpoint}

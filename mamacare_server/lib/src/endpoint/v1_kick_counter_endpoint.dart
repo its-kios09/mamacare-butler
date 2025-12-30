@@ -1,5 +1,6 @@
 import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
+import '../services/gemini_service.dart';
 
 class V1KickCounterEndpoint extends Endpoint {
   /// Save a kick counting session
@@ -102,54 +103,40 @@ class V1KickCounterEndpoint extends Endpoint {
     }
   }
 
-  /// Analyze kick pattern (simple version, will add Gemini later)
-  Future<String> analyzeKickPattern(
+  /// Get AI-powered kick pattern analysis using Gemini
+  Future<String> getAIInsight(
     Session session,
     int userId,
+    int pregnancyWeek,
   ) async {
     try {
       final sessions = await getRecentKicks(session, userId, 7);
 
       if (sessions.isEmpty) {
-        return 'Start counting kicks to see AI insights!';
+        return 'Start counting kicks to get AI insights!';
       }
 
-      if (sessions.length < 3) {
-        return 'Keep counting! We need at least 3 sessions to analyze patterns.';
-      }
+      // Convert to map for Gemini
+      final sessionData = sessions
+          .map(
+            (s) => {
+              'kickCount': s.kickCount,
+              'durationMinutes': s.durationMinutes,
+            },
+          )
+          .toList();
 
-      final totalKicks = sessions.fold<int>(0, (sum, s) => sum + s.kickCount);
-      final average = (totalKicks / sessions.length).round();
+      final gemini = GeminiService();
+      final insight = await gemini.analyzeKickPattern(
+        sessions: sessionData,
+        pregnancyWeek: pregnancyWeek,
+      );
 
-      final recentThree = sessions.take(3).toList();
-      final isDecreasing =
-          recentThree.length >= 3 &&
-          recentThree[0].kickCount < recentThree[1].kickCount &&
-          recentThree[1].kickCount < recentThree[2].kickCount;
-
-      final hasLowCount = sessions.any((s) => s.kickCount < 10);
-
-      String insight;
-      if (isDecreasing) {
-        insight =
-            '⚠️ Your kick counts are declining. Consider consulting your doctor.';
-      } else if (hasLowCount) {
-        insight =
-            '⚠️ Some sessions show fewer than 10 kicks. Count for at least 2 hours.';
-      } else if (average >= 20) {
-        insight =
-            '✓ Excellent! Average of $average kicks per session. Very healthy!';
-      } else if (average >= 15) {
-        insight = '✓ Good! Your kick counts are healthy and consistent.';
-      } else {
-        insight = 'Your kick counts are within normal range.';
-      }
-
-      session.log('✅ Pattern analyzed');
+      session.log('✅ AI insight generated for user $userId');
       return insight;
     } catch (e) {
-      session.log('❌ Error analyzing pattern: $e', level: LogLevel.error);
-      return 'Unable to analyze pattern at this time.';
+      session.log('❌ Error getting AI insight: $e', level: LogLevel.error);
+      return 'AI analysis temporarily unavailable.';
     }
   }
 }

@@ -689,22 +689,26 @@ class _V1KickCounterEndpoint {
     });
   }
 
-  _i3.Future<String> analyzeKickPattern(
+  _i3.Future<String> getAIInsight(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
+    int pregnancyWeek,
   ) async {
     return _i1.callAwaitableFunctionAndHandleExceptions(() async {
       var _localUniqueSession =
           (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
             endpoint: 'v1KickCounter',
-            method: 'analyzeKickPattern',
+            method: 'getAIInsight',
           );
       try {
         var _localCallContext = await _endpointDispatch.getMethodCallContext(
           createSessionCallback: (_) => _localUniqueSession,
           endpointPath: 'v1KickCounter',
-          methodName: 'analyzeKickPattern',
-          parameters: _i1.testObjectToJson({'userId': userId}),
+          methodName: 'getAIInsight',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'pregnancyWeek': pregnancyWeek,
+          }),
           serializationManager: _serializationManager,
         );
         var _localReturnValue =

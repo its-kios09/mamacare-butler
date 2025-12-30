@@ -6,6 +6,7 @@
   import 'package:mamacare_flutter/screens/auth/phone_input_screen.dart';
   import '../../widgets/app_bar.dart';
   import '../../widgets/app_drawer.dart';
+import '../kick_counter/kick_counter_screen.dart';
 
   class HomeScreen extends StatefulWidget {
     const HomeScreen({super.key});
@@ -314,8 +315,9 @@
                       subtitle: 'Track movements',
                       color: Colors.blue,
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Kick Counter - Coming soon!')),
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const KickCounterScreen()),
                         );
                       },
                     ),
