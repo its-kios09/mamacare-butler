@@ -18,11 +18,15 @@ import 'package:serverpod_auth_core_client/serverpod_auth_core_client.dart'
     as _i4;
 import 'package:mamacare_client/src/protocol/auth_response.dart' as _i5;
 import 'package:mamacare_client/src/protocol/user.dart' as _i6;
-import 'package:mamacare_client/src/protocol/kick_session.dart' as _i7;
-import 'package:mamacare_client/src/protocol/maternal_profile.dart' as _i8;
-import 'package:mamacare_client/src/protocol/ultrasound_scan.dart' as _i9;
-import 'package:mamacare_client/src/protocol/greetings/greeting.dart' as _i10;
-import 'protocol.dart' as _i11;
+import 'package:mamacare_client/src/protocol/health_checkin.dart' as _i7;
+import 'package:mamacare_client/src/protocol/kick_session.dart' as _i8;
+import 'package:mamacare_client/src/protocol/maternal_profile.dart' as _i9;
+import 'package:mamacare_client/src/protocol/medication.dart' as _i10;
+import 'package:mamacare_client/src/protocol/ultrasound_analysis_result.dart'
+    as _i11;
+import 'package:mamacare_client/src/protocol/ultrasound_scan.dart' as _i12;
+import 'package:mamacare_client/src/protocol/greetings/greeting.dart' as _i13;
+import 'protocol.dart' as _i14;
 
 /// By extending [EmailIdpBaseEndpoint], the email identity provider endpoints
 /// are made available on the server and enable the corresponding sign-in widget
@@ -268,19 +272,74 @@ class EndpointV1Auth extends _i2.EndpointRef {
 }
 
 /// {@category Endpoint}
+class EndpointV1HealthCheckin extends _i2.EndpointRef {
+  EndpointV1HealthCheckin(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'v1HealthCheckin';
+
+  _i3.Future<_i7.HealthCheckin?> submitCheckin(
+    int userId,
+    int pregnancyWeek,
+    bool hasSevereHeadache,
+    bool hasVisionChanges,
+    bool hasAbdominalPain,
+    bool hasSwelling,
+    bool hasReducedFetalMovement,
+    bool hasVaginalBleeding,
+    bool hasFluidLeakage,
+    bool hasContractions,
+    int? systolicBP,
+    int? diastolicBP,
+    double? weight,
+    String? additionalSymptoms,
+  ) => caller.callServerEndpoint<_i7.HealthCheckin?>(
+    'v1HealthCheckin',
+    'submitCheckin',
+    {
+      'userId': userId,
+      'pregnancyWeek': pregnancyWeek,
+      'hasSevereHeadache': hasSevereHeadache,
+      'hasVisionChanges': hasVisionChanges,
+      'hasAbdominalPain': hasAbdominalPain,
+      'hasSwelling': hasSwelling,
+      'hasReducedFetalMovement': hasReducedFetalMovement,
+      'hasVaginalBleeding': hasVaginalBleeding,
+      'hasFluidLeakage': hasFluidLeakage,
+      'hasContractions': hasContractions,
+      'systolicBP': systolicBP,
+      'diastolicBP': diastolicBP,
+      'weight': weight,
+      'additionalSymptoms': additionalSymptoms,
+    },
+  );
+
+  _i3.Future<List<_i7.HealthCheckin>> getCheckinHistory(
+    int userId, {
+    required int limit,
+  }) => caller.callServerEndpoint<List<_i7.HealthCheckin>>(
+    'v1HealthCheckin',
+    'getCheckinHistory',
+    {
+      'userId': userId,
+      'limit': limit,
+    },
+  );
+}
+
+/// {@category Endpoint}
 class EndpointV1KickCounter extends _i2.EndpointRef {
   EndpointV1KickCounter(_i2.EndpointCaller caller) : super(caller);
 
   @override
   String get name => 'v1KickCounter';
 
-  /// Save a kick counting session
-  _i3.Future<_i7.KickSession?> saveKickSession(
+  _i3.Future<_i8.KickSession?> saveKickSession(
     int userId,
     int kickCount,
     int durationMinutes,
     String? notes,
-  ) => caller.callServerEndpoint<_i7.KickSession?>(
+  ) => caller.callServerEndpoint<_i8.KickSession?>(
     'v1KickCounter',
     'saveKickSession',
     {
@@ -291,11 +350,10 @@ class EndpointV1KickCounter extends _i2.EndpointRef {
     },
   );
 
-  /// Get recent kick sessions for a user
-  _i3.Future<List<_i7.KickSession>> getRecentKicks(
+  _i3.Future<List<_i8.KickSession>> getRecentKicks(
     int userId,
     int days,
-  ) => caller.callServerEndpoint<List<_i7.KickSession>>(
+  ) => caller.callServerEndpoint<List<_i8.KickSession>>(
     'v1KickCounter',
     'getRecentKicks',
     {
@@ -304,7 +362,13 @@ class EndpointV1KickCounter extends _i2.EndpointRef {
     },
   );
 
-  /// Get kick statistics for a user
+  _i3.Future<List<_i8.KickSession>> getUserSessions(int userId) =>
+      caller.callServerEndpoint<List<_i8.KickSession>>(
+        'v1KickCounter',
+        'getUserSessions',
+        {'userId': userId},
+      );
+
   _i3.Future<Map<String, dynamic>> getKickStats(
     int userId,
     int days,
@@ -317,7 +381,6 @@ class EndpointV1KickCounter extends _i2.EndpointRef {
     },
   );
 
-  /// Get AI-powered kick pattern analysis using Gemini
   _i3.Future<String> getAIInsight(
     int userId,
     int pregnancyWeek,
@@ -338,8 +401,7 @@ class EndpointV1MaternalProfile extends _i2.EndpointRef {
   @override
   String get name => 'v1MaternalProfile';
 
-  /// Create or update maternal profile
-  _i3.Future<_i8.MaternalProfile?> saveProfile(
+  _i3.Future<_i9.MaternalProfile?> saveProfile(
     int userId,
     String fullName,
     DateTime expectedDueDate,
@@ -349,7 +411,7 @@ class EndpointV1MaternalProfile extends _i2.EndpointRef {
     String? medicalHistory,
     String? emergencyContact,
     String? emergencyPhone,
-  ) => caller.callServerEndpoint<_i8.MaternalProfile?>(
+  ) => caller.callServerEndpoint<_i9.MaternalProfile?>(
     'v1MaternalProfile',
     'saveProfile',
     {
@@ -365,12 +427,109 @@ class EndpointV1MaternalProfile extends _i2.EndpointRef {
     },
   );
 
-  /// Get maternal profile by user ID
-  _i3.Future<_i8.MaternalProfile?> getProfile(int userId) =>
-      caller.callServerEndpoint<_i8.MaternalProfile?>(
+  _i3.Future<_i9.MaternalProfile?> getProfile(int userId) =>
+      caller.callServerEndpoint<_i9.MaternalProfile?>(
         'v1MaternalProfile',
         'getProfile',
         {'userId': userId},
+      );
+
+  _i3.Future<_i9.MaternalProfile?> updateProfile(_i9.MaternalProfile profile) =>
+      caller.callServerEndpoint<_i9.MaternalProfile?>(
+        'v1MaternalProfile',
+        'updateProfile',
+        {'profile': profile},
+      );
+}
+
+/// {@category Endpoint}
+class EndpointV1Medication extends _i2.EndpointRef {
+  EndpointV1Medication(_i2.EndpointCaller caller) : super(caller);
+
+  @override
+  String get name => 'v1Medication';
+
+  _i3.Future<_i10.Medication?> addMedication(
+    int userId,
+    String medicationName,
+    String dosage,
+    String frequency,
+    List<String> reminderTimes,
+    DateTime startDate,
+    DateTime? endDate,
+    String? notes,
+  ) => caller.callServerEndpoint<_i10.Medication?>(
+    'v1Medication',
+    'addMedication',
+    {
+      'userId': userId,
+      'medicationName': medicationName,
+      'dosage': dosage,
+      'frequency': frequency,
+      'reminderTimes': reminderTimes,
+      'startDate': startDate,
+      'endDate': endDate,
+      'notes': notes,
+    },
+  );
+
+  /// Get all medications for a user
+  _i3.Future<List<_i10.Medication>> getUserMedications(int userId) =>
+      caller.callServerEndpoint<List<_i10.Medication>>(
+        'v1Medication',
+        'getUserMedications',
+        {'userId': userId},
+      );
+
+  /// Get active medications for a user
+  _i3.Future<List<_i10.Medication>> getActiveMedications(int userId) =>
+      caller.callServerEndpoint<List<_i10.Medication>>(
+        'v1Medication',
+        'getActiveMedications',
+        {'userId': userId},
+      );
+
+  /// Update medication
+  _i3.Future<_i10.Medication?> updateMedication(
+    int medicationId,
+    String medicationName,
+    String dosage,
+    String frequency,
+    List<String> reminderTimes,
+    DateTime startDate,
+    DateTime? endDate,
+    String? notes,
+    bool isActive,
+  ) => caller.callServerEndpoint<_i10.Medication?>(
+    'v1Medication',
+    'updateMedication',
+    {
+      'medicationId': medicationId,
+      'medicationName': medicationName,
+      'dosage': dosage,
+      'frequency': frequency,
+      'reminderTimes': reminderTimes,
+      'startDate': startDate,
+      'endDate': endDate,
+      'notes': notes,
+      'isActive': isActive,
+    },
+  );
+
+  /// Delete medication
+  _i3.Future<bool> deleteMedication(int medicationId) =>
+      caller.callServerEndpoint<bool>(
+        'v1Medication',
+        'deleteMedication',
+        {'medicationId': medicationId},
+      );
+
+  /// Toggle medication active status
+  _i3.Future<bool> toggleMedicationStatus(int medicationId) =>
+      caller.callServerEndpoint<bool>(
+        'v1Medication',
+        'toggleMedicationStatus',
+        {'medicationId': medicationId},
       );
 }
 
@@ -381,12 +540,11 @@ class EndpointV1Ultrasound extends _i2.EndpointRef {
   @override
   String get name => 'v1Ultrasound';
 
-  /// Analyze ultrasound image with Gemini Vision
-  _i3.Future<Map<String, dynamic>> analyzeUltrasound(
+  _i3.Future<_i11.UltrasoundAnalysisResult> analyzeUltrasound(
     int userId,
     String imageBase64,
     int pregnancyWeek,
-  ) => caller.callServerEndpoint<Map<String, dynamic>>(
+  ) => caller.callServerEndpoint<_i11.UltrasoundAnalysisResult>(
     'v1Ultrasound',
     'analyzeUltrasound',
     {
@@ -396,8 +554,7 @@ class EndpointV1Ultrasound extends _i2.EndpointRef {
     },
   );
 
-  /// Save ultrasound scan record
-  _i3.Future<_i9.UltrasoundScan?> saveUltrasoundScan(
+  _i3.Future<_i12.UltrasoundScan?> saveUltrasoundScan(
     int userId,
     int pregnancyWeek,
     String imageBase64,
@@ -405,7 +562,7 @@ class EndpointV1Ultrasound extends _i2.EndpointRef {
     String aiExplanation,
     int? nextScanWeek,
     DateTime? nextScanDate,
-  ) => caller.callServerEndpoint<_i9.UltrasoundScan?>(
+  ) => caller.callServerEndpoint<_i12.UltrasoundScan?>(
     'v1Ultrasound',
     'saveUltrasoundScan',
     {
@@ -419,11 +576,17 @@ class EndpointV1Ultrasound extends _i2.EndpointRef {
     },
   );
 
-  /// Get user's ultrasound history
-  _i3.Future<List<_i9.UltrasoundScan>> getUserScans(int userId) =>
-      caller.callServerEndpoint<List<_i9.UltrasoundScan>>(
+  _i3.Future<List<_i12.UltrasoundScan>> getUserScans(int userId) =>
+      caller.callServerEndpoint<List<_i12.UltrasoundScan>>(
         'v1Ultrasound',
         'getUserScans',
+        {'userId': userId},
+      );
+
+  _i3.Future<String> analyzeHistory(int userId) =>
+      caller.callServerEndpoint<String>(
+        'v1Ultrasound',
+        'analyzeHistory',
         {'userId': userId},
       );
 }
@@ -438,8 +601,8 @@ class EndpointGreeting extends _i2.EndpointRef {
   String get name => 'greeting';
 
   /// Returns a personalized greeting message: "Hello {name}".
-  _i3.Future<_i10.Greeting> hello(String name) =>
-      caller.callServerEndpoint<_i10.Greeting>(
+  _i3.Future<_i13.Greeting> hello(String name) =>
+      caller.callServerEndpoint<_i13.Greeting>(
         'greeting',
         'hello',
         {'name': name},
@@ -477,7 +640,7 @@ class Client extends _i2.ServerpodClientShared {
     bool? disconnectStreamsOnLostInternetConnection,
   }) : super(
          host,
-         _i11.Protocol(),
+         _i14.Protocol(),
          securityContext: securityContext,
          streamingConnectionTimeout: streamingConnectionTimeout,
          connectionTimeout: connectionTimeout,
@@ -489,8 +652,10 @@ class Client extends _i2.ServerpodClientShared {
     emailIdp = EndpointEmailIdp(this);
     jwtRefresh = EndpointJwtRefresh(this);
     v1Auth = EndpointV1Auth(this);
+    v1HealthCheckin = EndpointV1HealthCheckin(this);
     v1KickCounter = EndpointV1KickCounter(this);
     v1MaternalProfile = EndpointV1MaternalProfile(this);
+    v1Medication = EndpointV1Medication(this);
     v1Ultrasound = EndpointV1Ultrasound(this);
     greeting = EndpointGreeting(this);
     modules = Modules(this);
@@ -502,9 +667,13 @@ class Client extends _i2.ServerpodClientShared {
 
   late final EndpointV1Auth v1Auth;
 
+  late final EndpointV1HealthCheckin v1HealthCheckin;
+
   late final EndpointV1KickCounter v1KickCounter;
 
   late final EndpointV1MaternalProfile v1MaternalProfile;
+
+  late final EndpointV1Medication v1Medication;
 
   late final EndpointV1Ultrasound v1Ultrasound;
 
@@ -517,8 +686,10 @@ class Client extends _i2.ServerpodClientShared {
     'emailIdp': emailIdp,
     'jwtRefresh': jwtRefresh,
     'v1Auth': v1Auth,
+    'v1HealthCheckin': v1HealthCheckin,
     'v1KickCounter': v1KickCounter,
     'v1MaternalProfile': v1MaternalProfile,
+    'v1Medication': v1Medication,
     'v1Ultrasound': v1Ultrasound,
     'greeting': greeting,
   };

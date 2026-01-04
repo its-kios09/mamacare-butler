@@ -19,10 +19,14 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i4;
 import 'package:mamacare_server/src/generated/auth_response.dart' as _i5;
 import 'package:mamacare_server/src/generated/user.dart' as _i6;
-import 'package:mamacare_server/src/generated/kick_session.dart' as _i7;
-import 'package:mamacare_server/src/generated/maternal_profile.dart' as _i8;
-import 'package:mamacare_server/src/generated/ultrasound_scan.dart' as _i9;
-import 'package:mamacare_server/src/generated/greetings/greeting.dart' as _i10;
+import 'package:mamacare_server/src/generated/health_checkin.dart' as _i7;
+import 'package:mamacare_server/src/generated/kick_session.dart' as _i8;
+import 'package:mamacare_server/src/generated/maternal_profile.dart' as _i9;
+import 'package:mamacare_server/src/generated/medication.dart' as _i10;
+import 'package:mamacare_server/src/generated/ultrasound_analysis_result.dart'
+    as _i11;
+import 'package:mamacare_server/src/generated/ultrasound_scan.dart' as _i12;
+import 'package:mamacare_server/src/generated/greetings/greeting.dart' as _i13;
 import 'package:mamacare_server/src/generated/protocol.dart';
 import 'package:mamacare_server/src/generated/endpoints.dart';
 export 'package:serverpod_test/serverpod_test_public_exports.dart';
@@ -136,9 +140,13 @@ class TestEndpoints {
 
   late final _V1AuthEndpoint v1Auth;
 
+  late final _V1HealthCheckinEndpoint v1HealthCheckin;
+
   late final _V1KickCounterEndpoint v1KickCounter;
 
   late final _V1MaternalProfileEndpoint v1MaternalProfile;
+
+  late final _V1MedicationEndpoint v1Medication;
 
   late final _V1UltrasoundEndpoint v1Ultrasound;
 
@@ -164,11 +172,19 @@ class _InternalTestEndpoints extends TestEndpoints
       endpoints,
       serializationManager,
     );
+    v1HealthCheckin = _V1HealthCheckinEndpoint(
+      endpoints,
+      serializationManager,
+    );
     v1KickCounter = _V1KickCounterEndpoint(
       endpoints,
       serializationManager,
     );
     v1MaternalProfile = _V1MaternalProfileEndpoint(
+      endpoints,
+      serializationManager,
+    );
+    v1Medication = _V1MedicationEndpoint(
       endpoints,
       serializationManager,
     );
@@ -577,6 +593,111 @@ class _V1AuthEndpoint {
   }
 }
 
+class _V1HealthCheckinEndpoint {
+  _V1HealthCheckinEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i7.HealthCheckin?> submitCheckin(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+    int pregnancyWeek,
+    bool hasSevereHeadache,
+    bool hasVisionChanges,
+    bool hasAbdominalPain,
+    bool hasSwelling,
+    bool hasReducedFetalMovement,
+    bool hasVaginalBleeding,
+    bool hasFluidLeakage,
+    bool hasContractions,
+    int? systolicBP,
+    int? diastolicBP,
+    double? weight,
+    String? additionalSymptoms,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1HealthCheckin',
+            method: 'submitCheckin',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1HealthCheckin',
+          methodName: 'submitCheckin',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'pregnancyWeek': pregnancyWeek,
+            'hasSevereHeadache': hasSevereHeadache,
+            'hasVisionChanges': hasVisionChanges,
+            'hasAbdominalPain': hasAbdominalPain,
+            'hasSwelling': hasSwelling,
+            'hasReducedFetalMovement': hasReducedFetalMovement,
+            'hasVaginalBleeding': hasVaginalBleeding,
+            'hasFluidLeakage': hasFluidLeakage,
+            'hasContractions': hasContractions,
+            'systolicBP': systolicBP,
+            'diastolicBP': diastolicBP,
+            'weight': weight,
+            'additionalSymptoms': additionalSymptoms,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i7.HealthCheckin?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i7.HealthCheckin>> getCheckinHistory(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId, {
+    required int limit,
+  }) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1HealthCheckin',
+            method: 'getCheckinHistory',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1HealthCheckin',
+          methodName: 'getCheckinHistory',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'limit': limit,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i7.HealthCheckin>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
 class _V1KickCounterEndpoint {
   _V1KickCounterEndpoint(
     this._endpointDispatch,
@@ -587,7 +708,7 @@ class _V1KickCounterEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i7.KickSession?> saveKickSession(
+  _i3.Future<_i8.KickSession?> saveKickSession(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
     int kickCount,
@@ -618,7 +739,7 @@ class _V1KickCounterEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i7.KickSession?>);
+                as _i3.Future<_i8.KickSession?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -626,7 +747,7 @@ class _V1KickCounterEndpoint {
     });
   }
 
-  _i3.Future<List<_i7.KickSession>> getRecentKicks(
+  _i3.Future<List<_i8.KickSession>> getRecentKicks(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
     int days,
@@ -653,7 +774,38 @@ class _V1KickCounterEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i7.KickSession>>);
+                as _i3.Future<List<_i8.KickSession>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i8.KickSession>> getUserSessions(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1KickCounter',
+            method: 'getUserSessions',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1KickCounter',
+          methodName: 'getUserSessions',
+          parameters: _i1.testObjectToJson({'userId': userId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i8.KickSession>>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -742,7 +894,7 @@ class _V1MaternalProfileEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i8.MaternalProfile?> saveProfile(
+  _i3.Future<_i9.MaternalProfile?> saveProfile(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
     String fullName,
@@ -783,7 +935,7 @@ class _V1MaternalProfileEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i8.MaternalProfile?>);
+                as _i3.Future<_i9.MaternalProfile?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -791,7 +943,7 @@ class _V1MaternalProfileEndpoint {
     });
   }
 
-  _i3.Future<_i8.MaternalProfile?> getProfile(
+  _i3.Future<_i9.MaternalProfile?> getProfile(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
   ) async {
@@ -814,7 +966,269 @@ class _V1MaternalProfileEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i8.MaternalProfile?>);
+                as _i3.Future<_i9.MaternalProfile?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i9.MaternalProfile?> updateProfile(
+    _i1.TestSessionBuilder sessionBuilder,
+    _i9.MaternalProfile profile,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1MaternalProfile',
+            method: 'updateProfile',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1MaternalProfile',
+          methodName: 'updateProfile',
+          parameters: _i1.testObjectToJson({'profile': profile}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i9.MaternalProfile?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+}
+
+class _V1MedicationEndpoint {
+  _V1MedicationEndpoint(
+    this._endpointDispatch,
+    this._serializationManager,
+  );
+
+  final _i2.EndpointDispatch _endpointDispatch;
+
+  final _i2.SerializationManager _serializationManager;
+
+  _i3.Future<_i10.Medication?> addMedication(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+    String medicationName,
+    String dosage,
+    String frequency,
+    List<String> reminderTimes,
+    DateTime startDate,
+    DateTime? endDate,
+    String? notes,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Medication',
+            method: 'addMedication',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Medication',
+          methodName: 'addMedication',
+          parameters: _i1.testObjectToJson({
+            'userId': userId,
+            'medicationName': medicationName,
+            'dosage': dosage,
+            'frequency': frequency,
+            'reminderTimes': reminderTimes,
+            'startDate': startDate,
+            'endDate': endDate,
+            'notes': notes,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i10.Medication?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i10.Medication>> getUserMedications(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Medication',
+            method: 'getUserMedications',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Medication',
+          methodName: 'getUserMedications',
+          parameters: _i1.testObjectToJson({'userId': userId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i10.Medication>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<List<_i10.Medication>> getActiveMedications(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Medication',
+            method: 'getActiveMedications',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Medication',
+          methodName: 'getActiveMedications',
+          parameters: _i1.testObjectToJson({'userId': userId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<List<_i10.Medication>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<_i10.Medication?> updateMedication(
+    _i1.TestSessionBuilder sessionBuilder,
+    int medicationId,
+    String medicationName,
+    String dosage,
+    String frequency,
+    List<String> reminderTimes,
+    DateTime startDate,
+    DateTime? endDate,
+    String? notes,
+    bool isActive,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Medication',
+            method: 'updateMedication',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Medication',
+          methodName: 'updateMedication',
+          parameters: _i1.testObjectToJson({
+            'medicationId': medicationId,
+            'medicationName': medicationName,
+            'dosage': dosage,
+            'frequency': frequency,
+            'reminderTimes': reminderTimes,
+            'startDate': startDate,
+            'endDate': endDate,
+            'notes': notes,
+            'isActive': isActive,
+          }),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<_i10.Medication?>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<bool> deleteMedication(
+    _i1.TestSessionBuilder sessionBuilder,
+    int medicationId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Medication',
+            method: 'deleteMedication',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Medication',
+          methodName: 'deleteMedication',
+          parameters: _i1.testObjectToJson({'medicationId': medicationId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<bool> toggleMedicationStatus(
+    _i1.TestSessionBuilder sessionBuilder,
+    int medicationId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Medication',
+            method: 'toggleMedicationStatus',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Medication',
+          methodName: 'toggleMedicationStatus',
+          parameters: _i1.testObjectToJson({'medicationId': medicationId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<bool>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -833,7 +1247,7 @@ class _V1UltrasoundEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<Map<String, dynamic>> analyzeUltrasound(
+  _i3.Future<_i11.UltrasoundAnalysisResult> analyzeUltrasound(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
     String imageBase64,
@@ -862,7 +1276,7 @@ class _V1UltrasoundEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<Map<String, dynamic>>);
+                as _i3.Future<_i11.UltrasoundAnalysisResult>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -870,7 +1284,7 @@ class _V1UltrasoundEndpoint {
     });
   }
 
-  _i3.Future<_i9.UltrasoundScan?> saveUltrasoundScan(
+  _i3.Future<_i12.UltrasoundScan?> saveUltrasoundScan(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
     int pregnancyWeek,
@@ -907,7 +1321,7 @@ class _V1UltrasoundEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i9.UltrasoundScan?>);
+                as _i3.Future<_i12.UltrasoundScan?>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -915,7 +1329,7 @@ class _V1UltrasoundEndpoint {
     });
   }
 
-  _i3.Future<List<_i9.UltrasoundScan>> getUserScans(
+  _i3.Future<List<_i12.UltrasoundScan>> getUserScans(
     _i1.TestSessionBuilder sessionBuilder,
     int userId,
   ) async {
@@ -938,7 +1352,38 @@ class _V1UltrasoundEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<List<_i9.UltrasoundScan>>);
+                as _i3.Future<List<_i12.UltrasoundScan>>);
+        return _localReturnValue;
+      } finally {
+        await _localUniqueSession.close();
+      }
+    });
+  }
+
+  _i3.Future<String> analyzeHistory(
+    _i1.TestSessionBuilder sessionBuilder,
+    int userId,
+  ) async {
+    return _i1.callAwaitableFunctionAndHandleExceptions(() async {
+      var _localUniqueSession =
+          (sessionBuilder as _i1.InternalTestSessionBuilder).internalBuild(
+            endpoint: 'v1Ultrasound',
+            method: 'analyzeHistory',
+          );
+      try {
+        var _localCallContext = await _endpointDispatch.getMethodCallContext(
+          createSessionCallback: (_) => _localUniqueSession,
+          endpointPath: 'v1Ultrasound',
+          methodName: 'analyzeHistory',
+          parameters: _i1.testObjectToJson({'userId': userId}),
+          serializationManager: _serializationManager,
+        );
+        var _localReturnValue =
+            await (_localCallContext.method.call(
+                  _localUniqueSession,
+                  _localCallContext.arguments,
+                )
+                as _i3.Future<String>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();
@@ -957,7 +1402,7 @@ class _GreetingEndpoint {
 
   final _i2.SerializationManager _serializationManager;
 
-  _i3.Future<_i10.Greeting> hello(
+  _i3.Future<_i13.Greeting> hello(
     _i1.TestSessionBuilder sessionBuilder,
     String name,
   ) async {
@@ -980,7 +1425,7 @@ class _GreetingEndpoint {
                   _localUniqueSession,
                   _localCallContext.arguments,
                 )
-                as _i3.Future<_i10.Greeting>);
+                as _i3.Future<_i13.Greeting>);
         return _localReturnValue;
       } finally {
         await _localUniqueSession.close();

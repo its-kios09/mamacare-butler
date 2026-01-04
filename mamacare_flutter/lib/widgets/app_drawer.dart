@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:mamacare_flutter/screens/auth/phone_input_screen.dart';
+import 'package:mamacare_flutter/screens/profile/profile_screen.dart';
 import 'package:mamacare_flutter/services/auth_service.dart';
+
+import '../constants/constant.dart';
+import '../screens/settings/settings_screen.dart';
+import '../screens/support/help_support_screen.dart';
 
 class AppDrawer extends StatelessWidget {
   final String userName;
@@ -62,33 +67,6 @@ class AppDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/health-trends');
             },
           ),
-
-          // Appointments
-          ListTile(
-            leading: const Icon(Icons.calendar_today),
-            title: const Text('Appointments'),
-            subtitle: const Text('Manage visits'),
-            onTap: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Appointments - Coming soon!')),
-              );
-            },
-          ),
-
-          // Educational Resources
-          ListTile(
-            leading: const Icon(Icons.school),
-            title: const Text('Learn'),
-            subtitle: const Text('Articles & videos'),
-            onTap: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Educational content - Coming soon!')),
-              );
-            },
-          ),
-
           const Divider(),
 
           // Profile
@@ -97,10 +75,10 @@ class AppDrawer extends StatelessWidget {
             title: const Text('My Profile'),
             onTap: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profile - Coming soon!')),
-              );
-            },
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProfileScreen()),
+              );            },
           ),
 
           // Settings
@@ -109,8 +87,9 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Settings'),
             onTap: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Settings - Coming soon!')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsScreen()),
               );
             },
           ),
@@ -123,8 +102,9 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Help & Support'),
             onTap: () {
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Help - Coming soon!')),
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const HelpSupportScreen()),
               );
             },
           ),
