@@ -3,7 +3,6 @@ import '../generated/protocol.dart';
 import '../services/gemini_service.dart';
 
 class V1KickCounterEndpoint extends Endpoint {
-  /// Save a kick counting session
   Future<KickSession?> saveKickSession(
     Session session,
     int userId,
@@ -32,7 +31,6 @@ class V1KickCounterEndpoint extends Endpoint {
     }
   }
 
-  /// Get recent kick sessions for a user
   Future<List<KickSession>> getRecentKicks(
     Session session,
     int userId,
@@ -57,7 +55,29 @@ class V1KickCounterEndpoint extends Endpoint {
     }
   }
 
-  /// Get kick statistics for a user
+  Future<List<KickSession>> getUserSessions(
+    Session session,
+    int userId,
+  ) async {
+    try {
+      final sessions = await KickSession.db.find(
+        session,
+        where: (t) => t.userId.equals(userId),
+        orderBy: (t) => t.sessionDate,
+        orderDescending: true,
+        limit: 100,
+      );
+
+      session.log(
+        'Retrieved ${sessions.length} kick sessions for user $userId',
+      );
+
+      return sessions;
+    } catch (e) {
+      session.log('Error getting user sessions: $e', level: LogLevel.error);
+      return [];
+    }
+  }
   Future<Map<String, dynamic>> getKickStats(
     Session session,
     int userId,
@@ -98,12 +118,11 @@ class V1KickCounterEndpoint extends Endpoint {
 
       return stats;
     } catch (e) {
-      session.log('❌ Error calculating kick stats: $e', level: LogLevel.error);
+      session.log('Error calculating kick stats: $e', level: LogLevel.error);
       return {'error': e.toString()};
     }
   }
 
-  /// Get AI-powered kick pattern analysis using Gemini
   Future<String> getAIInsight(
     Session session,
     int userId,
@@ -116,7 +135,6 @@ class V1KickCounterEndpoint extends Endpoint {
         return 'Start counting kicks to get AI insights!';
       }
 
-      // Convert to map for Gemini
       final sessionData = sessions
           .map(
             (s) => {
@@ -132,10 +150,10 @@ class V1KickCounterEndpoint extends Endpoint {
         pregnancyWeek: pregnancyWeek,
       );
 
-      session.log('✅ AI insight generated for user $userId');
+      session.log('AI insight generated for user $userId');
       return insight;
     } catch (e) {
-      session.log('❌ Error getting AI insight: $e', level: LogLevel.error);
+      session.log('Error getting AI insight: $e', level: LogLevel.error);
       return 'AI analysis temporarily unavailable.';
     }
   }

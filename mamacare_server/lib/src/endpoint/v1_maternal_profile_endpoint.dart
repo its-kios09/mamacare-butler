@@ -2,7 +2,6 @@ import 'package:serverpod/serverpod.dart';
 import '../generated/protocol.dart';
 
 class V1MaternalProfileEndpoint extends Endpoint {
-  /// Create or update maternal profile
   Future<MaternalProfile?> saveProfile(
     Session session,
     int userId,
@@ -16,7 +15,6 @@ class V1MaternalProfileEndpoint extends Endpoint {
     String? emergencyPhone,
   ) async {
     try {
-      // Calculate current week
       final now = DateTime.now();
       final lmp =
           lastMenstrualPeriod ??
@@ -24,14 +22,12 @@ class V1MaternalProfileEndpoint extends Endpoint {
       final daysSinceLMP = now.difference(lmp).inDays;
       final currentWeek = (daysSinceLMP / 7).floor();
 
-      // Check if profile exists
       final existing = await MaternalProfile.db.findFirstRow(
         session,
         where: (t) => t.userId.equals(userId),
       );
 
       if (existing != null) {
-        // Update existing profile
         final updated = existing.copyWith(
           fullName: fullName,
           expectedDueDate: expectedDueDate,
@@ -49,7 +45,6 @@ class V1MaternalProfileEndpoint extends Endpoint {
         session.log('Profile updated for user $userId');
         return updated;
       } else {
-        // Create new profile
         final profile = MaternalProfile(
           userId: userId,
           fullName: fullName,
@@ -74,7 +69,6 @@ class V1MaternalProfileEndpoint extends Endpoint {
     }
   }
 
-  /// Get maternal profile by user ID
   Future<MaternalProfile?> getProfile(Session session, int userId) async {
     try {
       final profile = await MaternalProfile.db.findFirstRow(
@@ -91,6 +85,32 @@ class V1MaternalProfileEndpoint extends Endpoint {
       return profile;
     } catch (e) {
       session.log('Error getting profile: $e', level: LogLevel.error);
+      return null;
+    }
+  }
+  Future<MaternalProfile?> updateProfile(
+    Session session,
+    MaternalProfile profile,
+  ) async {
+    try {
+      final existing = await MaternalProfile.db.findById(session, profile.id!);
+
+      if (existing == null) {
+        session.log('Profile not found: ${profile.id}');
+        return null;
+      }
+
+      final updated = profile.copyWith(
+        updatedAt: DateTime.now(),
+      );
+
+      await MaternalProfile.db.updateRow(session, updated);
+
+      session.log('Profile updated for user ${profile.userId}');
+
+      return updated;
+    } catch (e) {
+      session.log('Error updating profile: $e', level: LogLevel.error);
       return null;
     }
   }

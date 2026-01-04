@@ -1,0 +1,7 @@
+class: UltrasoundAnalysisResult
+fields:
+  measurements: Map<String, String>
+  explanation: String
+  nextScanWeek: int?
+  nextScanDate: DateTime?
+  nextScanReason: String?

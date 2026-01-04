@@ -1,0 +1,33 @@
+class: HealthCheckin
+table: health_checkins
+fields:
+  id: int?
+  userId: int
+  checkInDate: DateTime
+  pregnancyWeek: int
+  
+  # Symptoms (Yes/No questions)
+  hasSevereHeadache: bool
+  hasVisionChanges: bool
+  hasAbdominalPain: bool
+  hasSwelling: bool
+  hasReducedFetalMovement: bool
+  hasVaginalBleeding: bool
+  hasFluidLeakage: bool
+  hasContractions: bool
+  
+  systolicBP: int?
+  diastolicBP: int?
+  weight: double?
+  
+  additionalSymptoms: String?
+  
+  aiRiskAssessment: String, default='Pending analysis'
+  riskLevel: String, default='MEDIUM'
+  recommendations: String, default='Please consult your healthcare provider'
+  
+  createdAt: DateTime, default=now
+
+indexes:
+  userId_date_idx:
+    fields: userId, checkInDate

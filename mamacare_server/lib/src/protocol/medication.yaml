@@ -1,0 +1,18 @@
+class: Medication
+table: medications
+fields:
+  id: int?
+  userId: int
+  medicationName: String
+  dosage: String
+  frequency: String
+  reminderTimes: List<String>
+  startDate: DateTime
+  endDate: DateTime?
+  notes: String?
+  isActive: bool, default=true
+  createdAt: DateTime, default=now
+
+indexes:
+  medication_userId_idx:
+    fields: userId
