@@ -36,6 +36,7 @@ class _MaternalProfileScreenState extends State<MaternalProfileScreen> {
   String? _selectedBloodType;
   bool _isLoading = false;
   int selectedIndex = 0;
+  bool _eddManuallySet = false; // Track if EDD was manually changed
 
   final List<String> _bloodTypes = [
     'A+',
@@ -73,6 +74,11 @@ class _MaternalProfileScreenState extends State<MaternalProfileScreen> {
     super.dispose();
   }
 
+  // Calculate EDD from LMP using Naegele's rule (LMP + 280 days)
+  DateTime _calculateEDDFromLMP(DateTime lmp) {
+    return lmp.add(const Duration(days: 280));
+  }
+
   Future<void> _selectDate(BuildContext context, bool isEDD) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -87,8 +93,13 @@ class _MaternalProfileScreenState extends State<MaternalProfileScreen> {
       setState(() {
         if (isEDD) {
           _selectedEDD = picked;
+          _eddManuallySet = true; // Mark EDD as manually set
         } else {
           _selectedLMP = picked;
+          // Auto-calculate EDD from LMP if EDD hasn't been manually set
+          if (!_eddManuallySet) {
+            _selectedEDD = _calculateEDDFromLMP(picked);
+          }
         }
       });
     }
@@ -197,36 +208,6 @@ class _MaternalProfileScreenState extends State<MaternalProfileScreen> {
         ),
         const SizedBox(height: 15),
         const Text(
-          'Expected Due Date *',
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 10),
-        InkWell(
-          onTap: () => _selectDate(context, true),
-          child: InputDecorator(
-            decoration: InputDecoration(
-              labelStyle:
-              TextStyle(color: kTextGrey, fontSize: ScreenUtil().setSp(15)),
-              border: const OutlineInputBorder(),
-              enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: kTextGrey),
-              ),
-              focusedBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: kTextGrey),
-              ),
-            ),
-            child: Text(
-              _selectedEDD == null
-                  ? 'MM/DD/YYYY'
-                  : DateFormat('MMM dd, yyyy').format(_selectedEDD!),
-              style: TextStyle(
-                color: _selectedEDD == null ? kTextGrey : Colors.black,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 15),
-        const Text(
           'Last Menstrual Period (Optional)',
           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
         ),
@@ -251,6 +232,48 @@ class _MaternalProfileScreenState extends State<MaternalProfileScreen> {
                   : DateFormat('MMM dd, yyyy').format(_selectedLMP!),
               style: TextStyle(
                 color: _selectedLMP == null ? kTextGrey : Colors.black,
+              ),
+            ),
+          ),
+        ),
+        if (_selectedLMP != null && !_eddManuallySet)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              '💡 EDD auto-calculated from LMP',
+              style: TextStyle(
+                fontSize: 11,
+                color: Colors.blue.shade700,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        const SizedBox(height: 15),
+        const Text(
+          'Expected Due Date *',
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
+        InkWell(
+          onTap: () => _selectDate(context, true),
+          child: InputDecorator(
+            decoration: InputDecoration(
+              labelStyle:
+              TextStyle(color: kTextGrey, fontSize: ScreenUtil().setSp(15)),
+              border: const OutlineInputBorder(),
+              enabledBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: kTextGrey),
+              ),
+              focusedBorder: const OutlineInputBorder(
+                borderSide: BorderSide(color: kTextGrey),
+              ),
+            ),
+            child: Text(
+              _selectedEDD == null
+                  ? 'MM/DD/YYYY'
+                  : DateFormat('MMM dd, yyyy').format(_selectedEDD!),
+              style: TextStyle(
+                color: _selectedEDD == null ? kTextGrey : Colors.black,
               ),
             ),
           ),
@@ -489,7 +512,7 @@ class _MaternalProfileScreenState extends State<MaternalProfileScreen> {
                                     .showSnackBar(
                                   const SnackBar(
                                     content: Text(
-                                        'Please select Expected Due Date'),
+                                        'Please select Expected Due Date or Last Menstrual Period'),
                                     backgroundColor: Colors.red,
                                   ),
                                 );
@@ -499,7 +522,7 @@ class _MaternalProfileScreenState extends State<MaternalProfileScreen> {
                                 selectedIndex++;
                               });
                             }
-                          };
+                          }
                         },
                         color: _isLoading ? kTextGrey : kPrimaryColor,
                       ),
